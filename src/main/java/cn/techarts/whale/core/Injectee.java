@@ -42,21 +42,23 @@ public class Injectee {
 	//Is it a Provider<T>?
 	private boolean assembled;
 	
+	public static final int REF = 1, KEY = 2, VAL = 3, PROVIDER = 4;
+	
 	/**Create a REF object*/
 	public static Injectee ref(String ref) {
-		return new Injectee(ref, 1);
+		return new Injectee(ref, REF);
 	}
 	
 	/**Create a KEY object*/
 	public static Injectee key(String key, Class<?> t) {
-		var result = new Injectee(key, 2);
+		var result = new Injectee(key, KEY);
 		result.setType(t != null ? t : Object.class);
 		return result;
 	}
 	
 	/**Create a VAL object*/
 	public static Injectee val(Object val) {
-		var result = new Injectee(3);
+		var result = new Injectee(VAL);
 		result.setValue(val);
 		result.setType(val.getClass());
 		return result;
@@ -64,7 +66,7 @@ public class Injectee {
 	
 	/**Create an interface of Provider*/
 	public static Injectee provider(Type t) {
-		var result = new Injectee(4);
+		var result = new Injectee(PROVIDER);
 		result.setType(t);
 		result.setName(t.getTypeName());
 		return result;
@@ -95,25 +97,28 @@ public class Injectee {
 		if(named != null && valued != null) {
 			throw Panic.annotationConflicted();
 		}
-		if(valued != null) type = clazz;//KEY | VAL
+		this.setType(clazz); //REF / KEY / VAL
 		setName(clazz.getName(), named, valued);
 	}
 	
-	
 	private void setName(String t, Named n, Valued v) {
 		this.name = t; //Default Name
-		if(n == null && v == null) return; //REF
+		if(n == null && v == null) {
+			setInjectType(REF); 
+			return; //REF
+		}
+		
 		if(v != null) {
 			this.name = v.key();
 			if(v.val().isBlank()) {
-				this.setInjectType(2);
+				this.setInjectType(KEY);
 			}else {
-				this.setInjectType(3);
+				this.setInjectType(VAL);
 				value = Hotpot.cast(type, v.val());
 			}
 		}else {
 			var tmp = n.value();
-			this.setInjectType(1); //REF
+			this.setInjectType(REF); //REF
 			if(!tmp.isBlank()) this.name = tmp;
 		}
 	}
@@ -126,20 +131,20 @@ public class Injectee {
 	}
 	
 	public boolean isREF() {
-		return this.__t == 1;
+		return this.__t == REF;
 	}
 	
 	public boolean isKEY() {
-		return this.__t == 2;
+		return this.__t == KEY;
 	}
 	
 	public boolean isVAL() {
-		return this.__t == 3;
+		return this.__t == VAL;
 	}
 	
 	/**is Provider*/
 	public boolean isPRV() {
-		return this.__t == 4;
+		return this.__t == PROVIDER;
 	}
 	
 	public Object getValue() {

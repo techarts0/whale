@@ -113,10 +113,6 @@ public class Panic extends RuntimeException {
 		return new Panic("The constructor parameter type is required: " + arg);
 	}
 	
-	public static Panic factoryInitialized() {
-		return new Panic("The method Factory.start() can only be called ONCE.");
-	}
-	
 	public static Panic invalidBind(String from, String to) {
 		return new Panic("Failed to bind [" + from + "], because [" + to + "] does not exist.");
 	}

@@ -4,5 +4,5 @@ import cn.techarts.whale.Bind;
 
 @Bind(target=SomeInterfaceImpl.class)
 public interface SomeInterface {
-
+	public int getValue();
 }

@@ -48,7 +48,7 @@ public class Factory {
 	private Map<String, Craft> crafts;
 	private Map<String, Craft> material;
 	private Map<String, String> configs;
-	private Map<String, String> binders;
+	private Map<String, String> binders; //Target->Source
 	
 	private static final Logger LOGGER = Hotpot.getLogger();
 	
@@ -66,10 +66,8 @@ public class Factory {
 	 * <b>IMPORTANT: The method can only be called ONCE!</b>
 	 */
 	public void start() {
-		if(this.launched) {
-			throw Panic.factoryInitialized();
-		}
-		assembleAndInstanceCrafts().bindCrafts();
+		if(this.launched) return;
+		this.assembleAndInstanceCrafts();
 		this.launched = true; //The method can only be called ONCE.
 		LOGGER.info("Whale is initialized (" + crafts.size() + " beans)");
 	}
@@ -81,7 +79,7 @@ public class Factory {
 		}
 	}
 	
-	private void resolveConfigBasedCrafts(String... xmlResources) {
+	private void resolveXmlConfigBasedCrafts(String... xmlResources) {
 		if(xmlResources == null || xmlResources.length == 0) return;
 		for(int i = 0; i < xmlResources.length; i++) {
 			this.parseAndResolveXMLCrafts(xmlResources[i]);
@@ -132,7 +130,7 @@ public class Factory {
 	 * Parse the specified multiple XML files to register managed objects.
 	 */
 	public Factory parse(String[] xmlResources) {
-		resolveConfigBasedCrafts(xmlResources);
+		resolveXmlConfigBasedCrafts(xmlResources);
 		return this;
 	}
 	
@@ -140,7 +138,7 @@ public class Factory {
 	 * Parse the specified single XML file to register managed objects.
 	 */
 	public Factory parse(String xmlResource) {
-		resolveConfigBasedCrafts(xmlResource);
+		resolveXmlConfigBasedCrafts(xmlResource);
 		return this;
 	}
 	
@@ -180,22 +178,43 @@ public class Factory {
 		return this;
 	}
 	
+	/**
+	 * Bind an interface to an implementation class and register it into the factory.
+	 */
 	public Factory bind(String source, String target) {
 		if(source == null || target == null) return this;
-		this.binders.put(source, target);
+		this.binders.put(target, source);
+		this.appendMaterial(this.toCraft(target));
 		return this;
 	}
 	
+	/**
+	 * Bind an interface to an implementation class and register it into the factory.
+	 */
 	public Factory bind(String source, Class<?> target) {
 		if(source == null || target == null) return this;
-		this.binders.put(source, target.getName());
+		this.binders.put(target.getName(), source);
+		this.appendMaterial(this.toCraft(target));
 		return this;
 	}
 	
+	/**
+	 * Bind an interface to an implementation class and register it into the factory.
+	 */
 	public Factory bind(Class<?> source, Class<?> target) {
 		if(source == null || target == null) return this;
-		this.binders.put(source.getName(), target.getName());
+		this.binders.put(target.getName(), source.getName());
+		this.appendMaterial(this.toCraft(target));
 		return this;
+	}
+	
+	private void appendMaterial(Craft craft) {
+		var name = craft.getName();
+		material.put(name, craft);
+		var bind = binders.get(name);
+		if(bind != null) {
+			material.put(bind, craft);
+		}		
 	}
 	
 	private void register(String clzz) {
@@ -203,24 +222,24 @@ public class Factory {
 		var result = toCraft(clzz);
 		if(result == null) return;
 		if(!result.isManaged()) return;
-		material.put(result.getName(), result);
+		this.appendMaterial(result);
 	}
 	
 	private void register(Object bean) {
 		if(bean == null) return;
-		var craft = toCraft(bean.getClass());
-		craft.setInstance(bean);
-		material.put(craft.getName(), craft);
+		var result = toCraft(bean.getClass());
+		result.setInstance(bean);
+		this.appendMaterial(result);
 	}
 
 	private void register(Class<?> clazz) {
 		if(clazz == null) return;
-		var craft = toCraft(clazz);
-		material.put(craft.getName(), craft);
+		var result = toCraft(clazz);
+		this.appendMaterial(result);
 	}
 	
 	private void register(Craft craft) {
-		material.put(craft.getName(), craft);
+		this.appendMaterial(craft);
 	}
 	
 	private boolean isBinder(Class<?> clazz) {
@@ -228,7 +247,7 @@ public class Factory {
 		if(bind == null) return false;
 		var src = bind.value();
 		if(src.isBlank()) src = clazz.getName();
-		binders.put(src, bind.target().getName());
+		binders.put(bind.target().getName(), src);
 		return true;
 	}
 	
@@ -238,7 +257,7 @@ public class Factory {
 		var named = clazz.getAnnotation(Named.class);
 		var s = clazz.isAnnotationPresent(Singleton.class);
 		var explicitly = named != null || s;
-		//if(explicitly == false) return null;
+		if(explicitly == false) return null;
 		//Bean id: the qualifier name is first
 		var name = named != null ? named.value() : ""; 
 		if(name.isEmpty()) name = clazz.getName();
@@ -285,8 +304,10 @@ public class Factory {
 		if(start == 0) return this; //Assemble Completed
 		for(var entry : material.entrySet()) {
 			var craft = entry.getValue();
-			craft.inject(crafts, material, configs);
-			craft.construct().assemble().execute();
+			if(!craft.isAssembled()) {
+				craft.inject(crafts, material, configs);
+				craft.construct().assemble().execute();
+			}
 			if(craft.isAssembled()) {
 				var key = entry.getKey();
 				this.crafts.put(key, craft);
@@ -297,19 +318,6 @@ public class Factory {
 			throw Panic.circularDependence(dump());
 		}
 		return this.assembleAndInstanceCrafts();
-	}
-	
-	private void bindCrafts() {
-		if(this.binders.isEmpty()) return;
-		for(var entry : binders.entrySet()) {
-			var src = entry.getKey();
-			var tgt = entry.getValue();
-			var target = crafts.get(tgt);
-			if(target == null) {
-				throw Panic.invalidBind(src, tgt);
-			}
-			this.crafts.put(src, target); //Alias
-		}
 	}
 	
 	private String dump() {
@@ -360,6 +368,7 @@ public class Factory {
 		return Injectee.of(ref, key, val, type);
 	}
 	
+	//TODO XML DOES NOT SUPPORT METHOD INJECTION, PROVIDER AND BIND
 	private Craft xmlBean2Craft(Node node) {
 		if(node.getNodeType() != Node.ELEMENT_NODE) return null;
 		var craft = (org.w3c.dom.Element)node;
@@ -368,7 +377,6 @@ public class Factory {
 		result.setSingleton(craft.getAttribute("singleton"));
 		parseArgs(craft.getElementsByTagName("args"), result);
 		parseProps(craft.getElementsByTagName("props"), result);
-		//XML DOES NOT SUPPORT METHOD INJECTION
 		return result.withConstructor();
 	}
 	

@@ -19,10 +19,17 @@ public class Person {
 	private Provider<Office> office;
 	
 	@Inject
+	private SomeInterface service;
+	
+	@Inject
 	public Person(Provider<Mobile> mobile) {
 		this.mobile = mobile;
 	}
-
+	
+	public SomeInterface getService() {
+		return this.service;
+	}
+	
 	public int getId() {
 		return id;
 	}

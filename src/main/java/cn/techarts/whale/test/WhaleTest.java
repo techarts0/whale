@@ -14,9 +14,10 @@ public class WhaleTest {
 	public void testRegisterManually() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();
-		factory.register(Person.class, Mobile.class).register(Office.class)
-		.register(SomeInterfaceImpl.class)
+		factory
+		.register(Person.class, Mobile.class)
 		.bind(SomeInterface.class, SomeInterfaceImpl.class)
+		.register(Office.class)
 		.start();
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
@@ -24,6 +25,7 @@ public class WhaleTest {
 		
 		TestCase.assertNotNull(ctx.get(SomeInterface.class));
 		TestCase.assertEquals("+86", m.getZone());
+		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
 		TestCase.assertEquals(22, p.getOffice().getId());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
@@ -44,6 +46,7 @@ public class WhaleTest {
 		
 		TestCase.assertNotNull(ctx.get(SomeInterface.class));
 		TestCase.assertEquals("+86", m.getZone());
+		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
 		TestCase.assertEquals(22, p.getOffice().getId());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());

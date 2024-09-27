@@ -1,5 +1,6 @@
 package cn.techarts.whale.test;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import cn.techarts.whale.Valued;
@@ -7,10 +8,15 @@ import cn.techarts.whale.Valued;
 @Named
 public class SomeInterfaceImpl implements SomeInterface {
 	
-	@Valued(val="33")
-	private int value;
+	private int val;
 	
-	public SomeInterfaceImpl() {
-		
+	@Inject
+	public SomeInterfaceImpl(@Valued(val="33")int value) {
+		this.val = value;
+	}
+	
+	@Override
+	public int getValue() {
+		return this.val;
 	}
 }
