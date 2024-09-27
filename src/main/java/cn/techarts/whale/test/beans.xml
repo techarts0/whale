@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<bean id="person" singleton="true" type="cn.techarts.xkit.test.Person">
+		<props>
+			<prop name="id" key="user.id" />
+			<prop name="name" val="Jeff Dean" />
+		</props>
+	</bean>
+	
+</beans>

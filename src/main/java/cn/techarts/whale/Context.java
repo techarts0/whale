@@ -143,5 +143,7 @@ public class Context implements AutoCloseable{
 				}
 			}
 		}
+		this.crafts.clear();
+		this.configs.clear();
 	}
 }

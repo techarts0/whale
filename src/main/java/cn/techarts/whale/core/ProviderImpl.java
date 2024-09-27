@@ -24,22 +24,26 @@ import javax.inject.Provider;
  * @author rocwon@gmail.com
  */
 public class ProviderImpl<T> implements Provider<T> {
-	
-	private Craft bean = null;
+	private Craft craft = null;
 	private Class<T> clazz = null;
 	
 	
 	public ProviderImpl(){}
 	
 	public ProviderImpl(Class<T> clazz, Craft bean) {
-		this.bean = bean;
+		this.craft = bean;
 		this.clazz = clazz;
+	}
+	
+	public boolean verify() {
+		if(craft == null) return false;
+		return craft.isAssembled();
 	}
 	
 	@Override
 	public T get() {
-		if(bean == null) return null;
-		if(!bean.isAssembled()) return null;
-		return clazz.cast(bean.getInstance());
+		if(craft == null) return null;
+		if(!craft.isAssembled()) return null;
+		return clazz.cast(craft.getInstance());
 	}
 }

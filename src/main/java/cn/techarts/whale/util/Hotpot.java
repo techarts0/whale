@@ -29,8 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+
 import cn.techarts.whale.Panic;
 
 /**
@@ -128,6 +127,15 @@ public final class Hotpot {
 		return result != null ? result : type;
 	}
 	
+	/**
+	 * @return Returns true if the parameter equals "1" or "true"
+	 */
+	public static boolean toBoolean(String arg) {
+		if(arg == null) return false;
+		var val = arg.trim().toLowerCase();
+		return val.equals("1") || val.equals("true");
+	}
+	
 	public static boolean isPrimitive(Class<?> clazz) {
 		var name = clazz.getName();
 		return PRIMITIVES.containsKey(name);
@@ -222,70 +230,6 @@ public final class Hotpot {
 			throw new RuntimeException("Failed to dump the values to map", e);
 		}
 	}
-	
-	/**
-	 * Supported Algorithm: AES
-	 * @return Returns null if the key is invalid
-	 */
-	public static String decrypt(String target, byte[] key) {
-		if(target == null || key == null) return null;
-		try {
-			var secretKey = new SecretKeySpec(key, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.DECRYPT_MODE, secretKey);
-			return new String(cipher.doFinal(toBytes(target)));
-		}catch(Exception e) {
-			throw new RuntimeException("Failed to decrypt [" + target + "]", e);
-		}
-	}
-	
-	/**
-	 * Convert a hex string to bytes array
-	 */
-	public static byte[] toBytes(String hex) {
-        if(hex == null) return null;
-        var hexLength = hex.length();
-        var chars = hex.toCharArray();
-        var result = new byte[hexLength / 2];
-        for(int i = 0; i < result.length; i++) {
-        	var hc = String.valueOf(chars[i * 2]);
-        	var lc = String.valueOf(chars[i * 2 + 1]);
-        	var hi = Integer.parseInt(hc, 16);
-        	var li = Integer.parseInt(lc, 16);
-        	result[i] = (byte)(hi * 16 + li);
-        }
-        return result;
-	}
-	
-	/**
-	 * Supported Algorithm: AES
-	 * @return Returns null if the key is invalid
-	 */
-	public static String encrypt(String source, byte[] key) {
-		if(source == null || key == null) return null;
-		try {
-			var secretKey = new SecretKeySpec(key, "AES");
-			Cipher cipher = Cipher.getInstance("AES");
-			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-			return toHex(cipher.doFinal(source.getBytes()), false);
-		}catch(Exception e) {
-			throw new RuntimeException("Failed to encrypt [" + source + "]", e);
-		}
-	}
-	
-	/**
-	 *Convert bytes array to a hex string 
-	 */
-	public static String toHex(byte[] source, boolean upperCase) {
-		var result = new StringBuilder(32);
-		for(byte b : source) {
-			int val = ((int)b) & 0xFF;
-			if (val < 16) result.append("0");
-			result.append(Integer.toHexString(val));
-		}
-		var encrypted = result.toString();
-		return upperCase ? encrypted.toUpperCase() : encrypted;
-    }
 	
 	public static Logger getLogger() {
 		return Logger.getGlobal();

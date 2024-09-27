@@ -68,7 +68,7 @@ public class Factory {
 		}
 		this.assembleAndInstanceManagedCrafts();
 		this.launched = true; //The method can only be called ONCE.
-		LOGGER.info("The DI container is initialized (" + crafts.size() + " beans)");
+		LOGGER.info("Whale is initialized (" + crafts.size() + " beans)");
 	}
 	
 	private void resolveJSR330BasedCrafts(String... classpath) {
@@ -207,7 +207,7 @@ public class Factory {
 		var named = clazz.getAnnotation(Named.class);
 		var s = clazz.isAnnotationPresent(Singleton.class);
 		var explicitly = named != null || s;
-		if(explicitly == false) return null;
+		//if(explicitly == false) return null;
 		//Bean id: the qualifier name is first
 		var name = named != null ? named.value() : ""; 
 		if(name.isEmpty()) name = clazz.getName();

@@ -26,9 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import cn.techarts.whale.Panic;
-import cn.techarts.whale.util.Converter;
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -278,7 +276,8 @@ public class Craft {
 			try {
 				entry.getKey().invoke(instance, params);
 			}catch(Exception e) {
-				throw Panic.cannotInvoke(name, e);
+				var mn = entry.getKey().getName();
+				throw Panic.cannotInvoke(name + "." + mn, e);
 			}
 		}
 		return this.instance; //Constructed, assembled, executed.
@@ -414,11 +413,12 @@ public class Craft {
 		var fs = clazz.getDeclaredFields();
 		if(fs != null && fs.length != 0) {
 			for(var f : fs) {
-				if(f.isAnnotationPresent(Inject.class)) {
+				if(!f.isAnnotationPresent(Inject.class)) continue;
+				if(!isProvider(f)) {
 					this.addProperty(f, new Injectee(f));
-				}else if(isProvider(f)) {
+				}else {
 					var type = getGnericType(f);
-					addProperty(f, Injectee.provider(type)); 
+					this.addProperty(f, Injectee.provider(type));
 				}
 			}
 		}
@@ -442,7 +442,7 @@ public class Craft {
 	}
 	
 	public void setSingleton(String singleton) {
-		this.singleton = Converter.toBoolean(singleton);
+		this.singleton = Hotpot.toBoolean(singleton);
 	}
 	
 	public void addArgument(int index, Injectee arg) {
