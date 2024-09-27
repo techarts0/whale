@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import cn.techarts.whale.Bind;
 import cn.techarts.whale.Panic;
 import cn.techarts.whale.util.Hotpot;
 import cn.techarts.whale.util.Scanner;
@@ -47,6 +48,7 @@ public class Factory {
 	private Map<String, Craft> crafts;
 	private Map<String, Craft> material;
 	private Map<String, String> configs;
+	private Map<String, String> binders;
 	
 	private static final Logger LOGGER = Hotpot.getLogger();
 	
@@ -55,6 +57,7 @@ public class Factory {
 			throw Panic.nullContainer();
 		}
 		this.crafts = container;
+		this.binders = new HashMap<>(32);
 		material = new ConcurrentHashMap<>(256);
 		this.configs = configs != null ? configs : Map.of();
 	}
@@ -66,7 +69,7 @@ public class Factory {
 		if(this.launched) {
 			throw Panic.factoryInitialized();
 		}
-		this.assembleAndInstanceManagedCrafts();
+		assembleAndInstanceCrafts().bindCrafts();
 		this.launched = true; //The method can only be called ONCE.
 		LOGGER.info("Whale is initialized (" + crafts.size() + " beans)");
 	}
@@ -177,6 +180,24 @@ public class Factory {
 		return this;
 	}
 	
+	public Factory bind(String source, String target) {
+		if(source == null || target == null) return this;
+		this.binders.put(source, target);
+		return this;
+	}
+	
+	public Factory bind(String source, Class<?> target) {
+		if(source == null || target == null) return this;
+		this.binders.put(source, target.getName());
+		return this;
+	}
+	
+	public Factory bind(Class<?> source, Class<?> target) {
+		if(source == null || target == null) return this;
+		this.binders.put(source.getName(), target.getName());
+		return this;
+	}
+	
 	private void register(String clzz) {
 		if(clzz == null) return;
 		var result = toCraft(clzz);
@@ -202,7 +223,17 @@ public class Factory {
 		material.put(craft.getName(), craft);
 	}
 	
+	private boolean isBinder(Class<?> clazz) {
+		var bind = clazz.getAnnotation(Bind.class);
+		if(bind == null) return false;
+		var src = bind.value();
+		if(src.isBlank()) src = clazz.getName();
+		binders.put(src, bind.target().getName());
+		return true;
+	}
+	
 	private Craft toCraft(Class<?> clazz) {
+		if(isBinder(clazz)) return null;
 		if(!Hotpot.newable(clazz)) return null;
 		var named = clazz.getAnnotation(Named.class);
 		var s = clazz.isAnnotationPresent(Singleton.class);
@@ -249,9 +280,9 @@ public class Factory {
 		classes.forEach(clazz->this.register(clazz));
 	}
 	
-	private void assembleAndInstanceManagedCrafts() {
+	private Factory assembleAndInstanceCrafts() {
 		var start = material.size();
-		if(start == 0) return; //Assemble Completed
+		if(start == 0) return this; //Assemble Completed
 		for(var entry : material.entrySet()) {
 			var craft = entry.getValue();
 			craft.inject(crafts, material, configs);
@@ -265,7 +296,20 @@ public class Factory {
 		if(start == material.size()){ //Not Empty
 			throw Panic.circularDependence(dump());
 		}
-		this.assembleAndInstanceManagedCrafts();
+		return this.assembleAndInstanceCrafts();
+	}
+	
+	private void bindCrafts() {
+		if(this.binders.isEmpty()) return;
+		for(var entry : binders.entrySet()) {
+			var src = entry.getKey();
+			var tgt = entry.getValue();
+			var target = crafts.get(tgt);
+			if(target == null) {
+				throw Panic.invalidBind(src, tgt);
+			}
+			this.crafts.put(src, target); //Alias
+		}
 	}
 	
 	private String dump() {

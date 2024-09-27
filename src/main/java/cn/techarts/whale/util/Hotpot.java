@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
-
 import cn.techarts.whale.Panic;
 
 /**
@@ -46,8 +45,12 @@ public final class Hotpot {
 		return cast(t, (String)v);
 	}
 	
+	/**
+	 * Excludes interface, annotation, anonymous and abstract class.
+	 */
 	public static boolean newable(Class<?> clazz) {
 		if(clazz.isInterface()) return false;
+		if(clazz.isAnnotation()) return false;
 		if(clazz.isAnonymousClass()) return false;
 		return !Modifier.isAbstract(clazz.getModifiers());
 	}

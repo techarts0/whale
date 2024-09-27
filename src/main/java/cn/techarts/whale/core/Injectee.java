@@ -19,10 +19,7 @@ package cn.techarts.whale.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import java.security.Provider;
-
 import javax.inject.Named;
-
 import cn.techarts.whale.Panic;
 import cn.techarts.whale.Valued;
 import cn.techarts.whale.util.Hotpot;

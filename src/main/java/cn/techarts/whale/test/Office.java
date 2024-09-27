@@ -3,7 +3,6 @@ package cn.techarts.whale.test;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
 import cn.techarts.whale.Valued;
 
 @Singleton
