@@ -16,6 +16,7 @@ public class WhaleTest {
 		var factory = ctx.createFactory();
 		factory
 		.register(Person.class, Mobile.class)
+		.register(People.class)
 		.bind(SomeInterface.class, SomeInterfaceImpl.class)
 		.register(Office.class)
 		.start();
@@ -28,11 +29,12 @@ public class WhaleTest {
 		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
 		TestCase.assertEquals(22, p.getOffice().getId());
+		TestCase.assertEquals(3, o.getStudent().getId());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
 		TestCase.assertEquals("13980092699", o.getMobile().getNumber());
 		TestCase.assertEquals("Library", p.getOffice().getBuilding());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
-		TestCase.assertEquals("+86", o.getAdmin().getMobile().getZone());
+		TestCase.assertEquals(3, o.getAdmin().getId());
 	}
 	
 	//@Test
@@ -53,6 +55,6 @@ public class WhaleTest {
 		TestCase.assertEquals("13980092699", o.getMobile().getNumber());
 		TestCase.assertEquals("Library", p.getOffice().getBuilding());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
-		TestCase.assertEquals("+86", o.getAdmin().getMobile().getZone());
+		TestCase.assertEquals("+86", o.getAdmin().getId());
 	}
 }

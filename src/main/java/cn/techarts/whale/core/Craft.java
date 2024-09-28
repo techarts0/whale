@@ -369,7 +369,8 @@ public class Craft {
 					arguments.put(Integer.valueOf(i), arg);
 				}else {
 					var type = getGnericType(args[i]);
-					var arg = Injectee.provider(type);
+					var anns = args[i].getAnnotations();
+					var arg = Injectee.of(type, anns);
 					arguments.put(Integer.valueOf(i), arg);
 				}
 			}
@@ -401,7 +402,8 @@ public class Craft {
 							params[i] = new Injectee(args[i]);
 						}else {
 							var type = getGnericType(args[i]);
-							params[i] = Injectee.provider(type);
+							var anns = args[i].getAnnotations();
+							params[i] = Injectee.of(type, anns);
 						}
 						this.methods.put(m, params); 
 					}
@@ -421,7 +423,8 @@ public class Craft {
 					this.addProperty(f, new Injectee(f));
 				}else {
 					var type = getGnericType(f);
-					this.addProperty(f, Injectee.provider(type));
+					var anns = f.getAnnotations();
+					this.addProperty(f, Injectee.of(type, anns));
 				}
 			}
 		}

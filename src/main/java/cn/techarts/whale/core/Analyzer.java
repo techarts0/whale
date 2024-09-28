@@ -38,6 +38,7 @@ public class Analyzer {
 	private Named n = null;
 	private Valued v = null;
 	private Annotation q = null;
+	private String defaultName = null;
 	private boolean singleton = false;
 	
 	public Analyzer(Annotation[] args, int phase) {
@@ -59,6 +60,11 @@ public class Analyzer {
 				this.q = anno;
 			}
 		}
+	}
+	
+	public Analyzer(Annotation[] args, int phase, String defaultName) {
+		this(args, phase);
+		this.defaultName = defaultName;
 	}
 	
 	public boolean isSingleton() {
@@ -95,8 +101,8 @@ public class Analyzer {
 	/**
 	 * Priority: Named qualifier > Customized Qualifier > Class Name
 	 */
-	public String getQualifierName(String defaultName) {
+	public String getQualifierName() {
 		if(n != null && !n.value().isBlank()) return n.value();
-		return q != null ? q.toString() : defaultName;
+		return q != null ? q.toString() : this.defaultName;
 	}	
 }

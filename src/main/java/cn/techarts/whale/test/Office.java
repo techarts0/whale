@@ -12,7 +12,12 @@ public class Office {
 	private Provider<Mobile> mobile;
 	
 	@Inject
-	private Provider<Person> admin;
+	@Student
+	private Provider<People> admin;
+	
+	@Inject
+	@Student
+	private People student;
 	
 	public Office() {}
 	
@@ -42,8 +47,12 @@ public class Office {
 		this.building = building;
 	}
 
-	public Person getAdmin() {
+	public People getAdmin() {
 		return admin.get();
+	}
+	
+	public People getStudent() {
+		return this.student;
 	}
 
 }

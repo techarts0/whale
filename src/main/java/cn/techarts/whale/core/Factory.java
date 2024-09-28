@@ -250,11 +250,9 @@ public class Factory {
 	}
 	
 	private Craft toCraft(Class<?> clazz) {
-		if(isBinder(clazz)) return null;
-		if(!Hotpot.newable(clazz)) return null;
-		var analyzer = new Analyzer(clazz.getAnnotations(), 2);
-		var name = analyzer.getQualifierName(clazz.getName());
-		return new Craft(name, clazz, analyzer.isSingleton());			
+		if(isBinder(clazz) || !Hotpot.newable(clazz)) return null;
+		var analyzer = new Analyzer(clazz.getAnnotations(), 2, clazz.getName());
+		return new Craft(analyzer.getQualifierName(), clazz, analyzer.isSingleton());			
 	}
 	
 	private Craft toCraft(String className) {

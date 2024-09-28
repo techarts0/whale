@@ -16,6 +16,7 @@
 
 package cn.techarts.whale.core;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -62,15 +63,20 @@ public class Injectee {
 	}
 	
 	/**Create an interface of Provider*/
-	public static Injectee provider(Type t) {
-		var result = new Injectee(PROVIDER);
-		result.setType(t);
-		result.setName(t.getTypeName());
+	public static Injectee of(Type t, Annotation[] args) {
+		var result = new Injectee(PROVIDER, t);
+		var a = new Analyzer(args, 2, t.getTypeName());
+		result.setName(a.getQualifierName());
 		return result;
 	}
 	
 	Injectee(int __t) {
 		this.__t = __t;
+	}
+	
+	Injectee(int __t, Type tpye) {
+		this.__t = __t;
+		this.type = tpye;
 	}
 	
 	Injectee(String name, int __t) {
