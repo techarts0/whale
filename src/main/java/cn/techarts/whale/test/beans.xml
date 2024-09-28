@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans>
 	<bean id="person" singleton="true" type="cn.techarts.xkit.test.Person">
+		<args>
+			<arg ref="" type="" />
+			<arg key="" type="" />
+			<arg val="" type="" />
+		</args>
 		<props>
 			<prop name="id" key="user.id" />
 			<prop name="name" val="Jeff Dean" />
 		</props>
+		<methods>
+			<method name="setName">
+				<arg ref="" type="" />
+				<arg key="" type="" />
+				<arg val="" type="" />
+			</method>
+		</methods>
 	</bean>
 	
 </beans>

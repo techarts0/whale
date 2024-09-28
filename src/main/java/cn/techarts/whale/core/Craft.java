@@ -467,4 +467,9 @@ public class Craft {
 		if(val == null) return; 
 		arg.resetValue(Hotpot.cast(val, field.getType()));
 	}
+	
+	public void addMethod(Method method, Injectee[] args) {
+		if(method == null || args == null) return;
+		this.methods.put(method, args);
+	}
 }

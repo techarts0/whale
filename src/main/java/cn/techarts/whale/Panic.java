@@ -82,7 +82,7 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic circularDependence(String name) {
-		return new Panic("Circular dependent is detected: " + name);
+		return new Panic("Failed to assemble these beans because of circular dependent or dependence missing:\n" + name);
 	}
 	
 	public static Panic configKeyMissing(String key) {

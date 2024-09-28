@@ -18,16 +18,11 @@ package cn.techarts.whale.core;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import cn.techarts.whale.Bind;
 import cn.techarts.whale.Panic;
 import cn.techarts.whale.util.Hotpot;
@@ -56,7 +51,7 @@ public class Factory {
 		}
 		this.crafts = container;
 		this.binders = new HashMap<>(32);
-		material = new ConcurrentHashMap<>(256);
+		this.material = new ConcurrentHashMap<>(256);
 		this.configs = configs != null ? configs : Map.of();
 	}
 	
@@ -274,7 +269,7 @@ public class Factory {
 	        var crafts = doc.getElementsByTagName("bean");
 	        if(crafts == null || crafts.getLength() == 0) return;
 	        for(int i = 0; i < crafts.getLength(); i++) {
-	        	register(xmlBean2Craft(crafts.item(i)));
+	        	register(new XmlBean().toCraft(crafts.item(i)));
 	        }
 		}catch(Exception e) {
 			throw Panic.failed2ParseJson(resource, e);
@@ -319,66 +314,5 @@ public class Factory {
 		var start = result.length() - 2;
 		result.delete(start, start + 2);
 		return result.toString();
-	}
-	
-	private void parseArgs(NodeList args, Craft result) {
-		if(args == null || args.getLength() != 1) return;
-		var first = (org.w3c.dom.Element)args.item(0);
-		args = first.getElementsByTagName("arg");
-		if(args == null || args.getLength() == 0) return;
-		for(int i = 0; i < args.getLength(); i++) {
-			var arg = args.item(i);
-			if(arg.getNodeType() != Node.ELEMENT_NODE) continue;
-			var injector = xmlNode2Injector((Element)arg);
-			result.addArgument(i, injector);
-		}
-	}
-	
-	private void parseProps(NodeList props, Craft result) {
-		if(props == null || props.getLength() != 1) return;
-		var first = (org.w3c.dom.Element)props.item(0);
-		props = first.getElementsByTagName("prop");
-		if(props == null || props.getLength() == 0) return;
-		var fields = new HashMap<String, Field>();
-		getFields(fields, Hotpot.forName(result.getType()));
-		for(int i = 0; i < props.getLength(); i++) {
-			var prop = props.item(i);
-			if(prop.getNodeType() != Node.ELEMENT_NODE) continue;
-			var tmp = (Element)prop;
-			var name = tmp.getAttribute("name");
-			var injector = xmlNode2Injector(tmp);
-			result.addProperty(fields.get(name), injector);
-		}
-	}
-	
-	private Injectee xmlNode2Injector(Element node) {
-		var ref = node.getAttribute("ref");
-		var key = node.getAttribute("key");
-		var val = node.getAttribute("val");
-		var type = node.getAttribute("type");
-		return Injectee.of(ref, key, val, type);
-	}
-	
-	//TODO XML DOES NOT SUPPORT METHOD INJECTION, PROVIDER AND BIND
-	private Craft xmlBean2Craft(Node node) {
-		if(node.getNodeType() != Node.ELEMENT_NODE) return null;
-		var craft = (org.w3c.dom.Element)node;
-		var result = new Craft(craft.getAttribute("type"));
-		result.setName(craft.getAttribute("id"));
-		result.setSingleton(craft.getAttribute("singleton"));
-		parseArgs(craft.getElementsByTagName("args"), result);
-		parseProps(craft.getElementsByTagName("props"), result);
-		return result.withConstructor();
-	}
-	
-	private void getFields(Map<String, Field> result, Class<?> clazz) {
-		if(clazz == null) return; //Without super class
-		var fs = clazz.getDeclaredFields();
-		if(fs != null && fs.length != 0) {
-			for(var f : fs) {
-				result.put(f.getName(), f);
-			}
-		}
-		getFields(result, clazz.getSuperclass());
-	}
+	}	
 }
