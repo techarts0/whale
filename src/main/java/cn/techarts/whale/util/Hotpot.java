@@ -270,7 +270,7 @@ public final class Hotpot {
 	/**
 	 * INI-Liked configuration
 	 */
-	public static Map<String, String> resolveConfiguration1(String path){
+	public static Map<String, String> resolveConfiguration(String path){
 		boolean multiLines = false;
 		String line = null, sentence = null;
 		var result = new HashMap<String, String>(512);

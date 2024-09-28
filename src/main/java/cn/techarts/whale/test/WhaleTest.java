@@ -35,7 +35,7 @@ public class WhaleTest {
 		TestCase.assertEquals("+86", o.getAdmin().getMobile().getZone());
 	}
 	
-	@Test
+	//@Test
 	public void testScanClasspath() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();

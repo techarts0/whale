@@ -19,9 +19,6 @@ package cn.techarts.whale.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
-import javax.inject.Named;
-import cn.techarts.whale.Panic;
-import cn.techarts.whale.Valued;
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -82,45 +79,11 @@ public class Injectee {
 	}
 	
 	public Injectee(Parameter p) {
-		var named = p.getAnnotation(Named.class);
-		var valued = p.getAnnotation(Valued.class);
-		parseAnnotations(named, valued, p.getType());
+		new Analyzer(p.getAnnotations(), 3).set(this, p.getType());
 	}
 	
 	public Injectee(Field f) {
-		var named = f.getAnnotation(Named.class);
-		var valued = f.getAnnotation(Valued.class);
-		parseAnnotations(named, valued, f.getType());
-	}
-	
-	private void  parseAnnotations(Named named, Valued valued, Class<?> clazz) {
-		if(named != null && valued != null) {
-			throw Panic.annotationConflicted();
-		}
-		this.setType(clazz); //REF / KEY / VAL
-		setName(clazz.getName(), named, valued);
-	}
-	
-	private void setName(String t, Named n, Valued v) {
-		this.name = t; //Default Name
-		if(n == null && v == null) {
-			setInjectType(REF); 
-			return; //REF
-		}
-		
-		if(v != null) {
-			this.name = v.key();
-			if(v.val().isBlank()) {
-				this.setInjectType(KEY);
-			}else {
-				this.setInjectType(VAL);
-				value = Hotpot.cast(type, v.val());
-			}
-		}else {
-			var tmp = n.value();
-			this.setInjectType(REF); //REF
-			if(!tmp.isBlank()) this.name = tmp;
-		}
+		new Analyzer(f.getAnnotations(), 3).set(this, f.getType());
 	}
 	
 	public void setName(String name) {

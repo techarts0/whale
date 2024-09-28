@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -82,7 +80,7 @@ public class Factory {
 	private void resolveXmlConfigBasedCrafts(String... xmlResources) {
 		if(xmlResources == null || xmlResources.length == 0) return;
 		for(int i = 0; i < xmlResources.length; i++) {
-			this.parseAndResolveXMLCrafts(xmlResources[i]);
+			this.loadAndResolveXMLCrafts(xmlResources[i]);
 		}
 	}
 	
@@ -179,32 +177,32 @@ public class Factory {
 	}
 	
 	/**
-	 * Bind an interface to an implementation class and register it into the factory.
+	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(String source, String target) {
-		if(source == null || target == null) return this;
-		this.binders.put(target, source);
-		this.appendMaterial(this.toCraft(target));
+	public Factory bind(String abstraction, String implementation) {
+		if(abstraction == null || implementation == null) return this;
+		this.binders.put(implementation, abstraction);
+		this.appendMaterial(this.toCraft(implementation));
 		return this;
 	}
 	
 	/**
-	 * Bind an interface to an implementation class and register it into the factory.
+	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(String source, Class<?> target) {
-		if(source == null || target == null) return this;
-		this.binders.put(target.getName(), source);
-		this.appendMaterial(this.toCraft(target));
+	public Factory bind(String abstraction, Class<?> implementation) {
+		if(abstraction == null || implementation == null) return this;
+		this.binders.put(implementation.getName(), abstraction);
+		this.appendMaterial(this.toCraft(implementation));
 		return this;
 	}
 	
 	/**
-	 * Bind an interface to an implementation class and register it into the factory.
+	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(Class<?> source, Class<?> target) {
-		if(source == null || target == null) return this;
-		this.binders.put(target.getName(), source.getName());
-		this.appendMaterial(this.toCraft(target));
+	public Factory bind(Class<?> abstraction, Class<?> implementation) {
+		if(abstraction == null || implementation == null) return this;
+		this.binders.put(implementation.getName(), abstraction.getName());
+		this.appendMaterial(this.toCraft(implementation));
 		return this;
 	}
 	
@@ -254,14 +252,9 @@ public class Factory {
 	private Craft toCraft(Class<?> clazz) {
 		if(isBinder(clazz)) return null;
 		if(!Hotpot.newable(clazz)) return null;
-		var named = clazz.getAnnotation(Named.class);
-		var s = clazz.isAnnotationPresent(Singleton.class);
-		var explicitly = named != null || s;
-		if(explicitly == false) return null;
-		//Bean id: the qualifier name is first
-		var name = named != null ? named.value() : ""; 
-		if(name.isEmpty()) name = clazz.getName();
-		return new Craft(name, clazz, s, explicitly);			
+		var analyzer = new Analyzer(clazz.getAnnotations(), 2);
+		var name = analyzer.getQualifierName(clazz.getName());
+		return new Craft(name, clazz, analyzer.isSingleton());			
 	}
 	
 	private Craft toCraft(String className) {
@@ -273,7 +266,7 @@ public class Factory {
 	}
 	
 	/**Crafts defined in XML file.*/
-	private void parseAndResolveXMLCrafts(String resource){
+	private void loadAndResolveXMLCrafts(String resource){
 		if(resource == null|| resource.isBlank()) return;
 		try {
 			var factory = DocumentBuilderFactory.newInstance();

@@ -65,10 +65,6 @@ public class Panic extends RuntimeException {
 		return new Panic("You must qualify the constructor parameter[" + name + "]");
 	}
 	
-	public static Panic annotationConflicted() {
-		return new Panic("Only one of Named or Valued annotation is allowed.");
-	}
-	
 	public static Panic annotationMissing() {
 		return new Panic("At least one of Named or Valued annotation is required.");
 	}

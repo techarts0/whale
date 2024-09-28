@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 /**
  *Bind a qualifier name to an exist managed object. 
- *It's often used to bind an interface to an implementation.
+ *It's often used to bind an interface or abstract class to an implementation.
  * 
  * @author rocwon@gmail.com
  */
@@ -34,6 +34,14 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Bind {
+	
+	/**
+	 * An interface or abstract class.
+	 */
 	public String value() default "";
+	
+	/**
+	 * An implementation class.
+	 */
 	public Class<?> target();
 }

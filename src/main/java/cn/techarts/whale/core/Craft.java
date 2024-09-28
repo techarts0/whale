@@ -32,6 +32,7 @@ import cn.techarts.whale.util.Hotpot;
 /**
  * The core concept of whale. <br>
  * It represents a managed object with meta-data in the container.
+ * In Spring and other IOC frameworks, it's often referred to as "bean".
  * @author rocwon@gmail.com
  */
 public class Craft {
@@ -40,7 +41,6 @@ public class Craft {
 	private Object instance;
 	private boolean singleton;
 	private boolean assembled;
-	private boolean explicitly;
 		
 	/** Injected or default constructor*/
 	private Constructor<?> constructor;
@@ -57,7 +57,6 @@ public class Craft {
 	/**From XML Declaration*/
 	public Craft(String type) {
 		this.type = type;
-		this.explicitly = true;
 		this.methods = new HashMap<>();
 		this.arguments = new HashMap<>();
 		this.properties = new HashMap<>();	
@@ -68,10 +67,9 @@ public class Craft {
 	}
 	
 	/**From Annotation*/
-	public Craft(String name, Class<?> clazz, boolean singleton, boolean explicitly) {
+	public Craft(String name, Class<?> clazz, boolean singleton) {
 		this.name = name;
 		this.singleton = singleton;
-		this.explicitly = explicitly;
 		this.methods = new HashMap<>();
 		this.arguments = new HashMap<>();
 		this.properties = new HashMap<>();
@@ -81,11 +79,13 @@ public class Craft {
 	}
 	
 	public boolean isManaged() {
-		if(explicitly) return true;
 		if(!arguments.isEmpty()) {
 			return true;
 		}
-		return !properties.isEmpty();
+		if(!properties.isEmpty()) {
+			return true;
+		}
+		return !methods.isEmpty();
 	}
 	
 	/**
@@ -349,7 +349,10 @@ public class Craft {
 		return this;
 	}
 	
-	//TODO Provider
+	/**Important: You cannot use a Provider 
+	 * as a parameter and call @link{get()} 
+	 * method within the constructor immediately.
+	*/
 	private void resolveInjectedContructor(Class<?> clazz) {
 		var cons = clazz.getConstructors();
 		if(cons == null || cons.length == 0) return;
@@ -357,7 +360,7 @@ public class Craft {
 		for(var c : cons) {
 			if(!c.isAnnotationPresent(Inject.class)) continue;
 			this.constructor = c; //Cache it for new instance
-			var args = this.constructor.getParameters();
+			var args = c.getParameters();
 			if(args == null || args.length == 0) break;
 			
 			for(int i = 0; i < args.length; i++) {
@@ -373,7 +376,7 @@ public class Craft {
 			break; //Only ONE constructor can be injected
 		}
 		
-		if(this.constructor == null && explicitly) {
+		if(this.constructor == null) {//explicitly?
 			try { //Default and public constructor
 				this.constructor = clazz.getConstructor();
 			}catch(NoSuchMethodException | SecurityException es) {
