@@ -11,6 +11,9 @@ public class Person {
 	@Inject
 	@Valued(key="user.id")
 	private int id;
+	
+	@Inject
+	@Valued(key="user.name")
 	private String name;
 	
 	private Provider<Mobile> mobile;

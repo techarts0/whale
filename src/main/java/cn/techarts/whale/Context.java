@@ -34,6 +34,7 @@ import cn.techarts.whale.util.Hotpot;
 public class Context implements AutoCloseable{
 	private Map<String, Craft> crafts;
 	private Map<String, String> configs;
+	private boolean factoryCreated = false;
 	public static final String NAME = "context.dragonfly.techarts.cn";
 	private static final Logger LOGGER = Hotpot.getLogger();
 	
@@ -62,10 +63,12 @@ public class Context implements AutoCloseable{
 	}
 	
 	/**
-	 * Create a bean factory to bind beans manually.<p>
-	 * IMPORTANT: The factory will be reset if you recreate the factory object! 
+	 * Create a bean factory to register/bind beans manually.<p>
+	 * If the factory has been created, null will be returned.
 	 */
 	public Factory createFactory() {
+		if(factoryCreated) return null;
+		this.factoryCreated = true; //ONCE
 		return new Factory(crafts, configs);
 	}
 	
@@ -82,6 +85,13 @@ public class Context implements AutoCloseable{
 	Context(Map<String, Craft> container, Map<String, String> configs){
 		this.configs = configs == null ? Map.of() : configs;
 		this.crafts = container == null ? Map.of() : container;
+	}
+	
+	/**
+	 * Append managed objects while context initialized.
+	 */
+	public void append(Class<?>... classes) {
+		new Factory(crafts, configs).append(classes);
 	}
 	
 	/**

@@ -83,6 +83,7 @@ public class Factory {
 	 * Load and register managed beans from multiple JAR files.
 	 */
 	public Factory load(String[] jars) {
+		if(launched) return this;
 		if(jars == null) return this;
 		if(jars.length == 0) return this;
 		for(var jar : jars) load(jar);
@@ -93,6 +94,7 @@ public class Factory {
 	 * Load and register managed beans from a JAR file.
 	 */
 	public Factory load(String jar) {
+		if(launched) return this;
 		if(jar == null) return this;
 		var classes = Scanner.scanJar(jar);
 		if(classes == null) return this;
@@ -107,6 +109,7 @@ public class Factory {
 	 * Scan the specified multiple class-paths to register managed objects.
 	 */
 	public Factory scan(String[] classpaths) {
+		if(this.launched) return this;
 		resolveJSR330BasedCrafts(classpaths);
 		return this;
 	}
@@ -115,6 +118,7 @@ public class Factory {
 	 * Scan the specified single class-path to register managed objects.
 	 */
 	public Factory scan(String classpath) {
+		if(this.launched) return this;
 		resolveJSR330BasedCrafts(classpath);
 		return this;
 	}
@@ -123,6 +127,7 @@ public class Factory {
 	 * Parse the specified multiple XML files to register managed objects.
 	 */
 	public Factory parse(String[] xmlResources) {
+		if(this.launched) return this;
 		resolveXmlConfigBasedCrafts(xmlResources);
 		return this;
 	}
@@ -131,6 +136,7 @@ public class Factory {
 	 * Parse the specified single XML file to register managed objects.
 	 */
 	public Factory parse(String xmlResource) {
+		if(this.launched) return this;
 		resolveXmlConfigBasedCrafts(xmlResource);
 		return this;
 	}
@@ -139,6 +145,7 @@ public class Factory {
 	 * Append a managed bean instance into IOC container.
 	 */
 	public Factory register(Object... beans) {
+		if(this.launched) return this;
 		if(beans == null) return this;
 		if(beans.length == 0) return this;
 		for(var bean : beans) {
@@ -146,23 +153,19 @@ public class Factory {
 		}
 		return this;
 	}
-	
 	/**
 	 * Append a managed bean into IOC container by class.
 	 */
 	public Factory register(Class<?>... beans) {
-		if(beans == null) return this;
-		if(beans.length == 0) return this;
-		for(var bean : beans) {
-			this.register(bean);
-		}
-		return this;
+		if(this.launched) return this;
+		return this.register(beans);
 	}
 	
 	/**
 	 * Append a managed bean into IOC container by class name.
 	 */
 	public Factory register(String... classes) {
+		if(this.launched) return this;
 		if(classes == null) return this;
 		if(classes.length == 0) return this;
 		for(var clazz : classes) {
@@ -175,6 +178,7 @@ public class Factory {
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
 	public Factory bind(String abstraction, String implementation) {
+		if(this.launched) return this;
 		if(abstraction == null || implementation == null) return this;
 		this.binders.put(implementation, abstraction);
 		this.appendMaterial(this.toCraft(implementation));
@@ -185,6 +189,7 @@ public class Factory {
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
 	public Factory bind(String abstraction, Class<?> implementation) {
+		if(this.launched) return this;
 		if(abstraction == null || implementation == null) return this;
 		this.binders.put(implementation.getName(), abstraction);
 		this.appendMaterial(this.toCraft(implementation));
@@ -195,9 +200,31 @@ public class Factory {
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
 	public Factory bind(Class<?> abstraction, Class<?> implementation) {
+		if(this.launched) return this;
 		if(abstraction == null || implementation == null) return this;
 		this.binders.put(implementation.getName(), abstraction.getName());
 		this.appendMaterial(this.toCraft(implementation));
+		return this;
+	}
+	
+	/**
+	 * Append managed objects into context after calling {@link start()}.<p>
+	 */
+	public void append(Class<?>[] classes) {
+		if(crafts.isEmpty()) return;
+		this.register0(classes);
+		this.assembleAndInstanceCrafts();
+	}
+	
+	/**
+	 * Append a managed bean into IOC container by class.
+	 */
+	private Factory register0(Class<?>... beans) {
+		if(beans == null) return this;
+		if(beans.length == 0) return this;
+		for(var bean : beans) {
+			this.register(bean);
+		}
 		return this;
 	}
 	
