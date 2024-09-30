@@ -65,8 +65,7 @@ public class WebListener implements ServletContextListener {
 		if(context != null) context.close();
 	}
 	
-	public<T> T get(ServletContext ctx, String id, Class<T> clzz)
-	{
+	public<T> T get(ServletContext ctx, String id, Class<T> clzz){
 		return Context.from(ctx).get(id, clzz);
 	}
 	
