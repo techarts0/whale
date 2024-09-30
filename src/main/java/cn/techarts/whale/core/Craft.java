@@ -472,4 +472,17 @@ public class Craft {
 		if(method == null || args == null) return;
 		this.methods.put(method, args);
 	}
+	
+	public void destroy() {
+		if(instance == null) return;
+		if(instance instanceof AutoCloseable) {
+			try {
+				((AutoCloseable)instance).close();
+				System.out.println("destroy " +  instance.hashCode());
+				this.instance = null;
+			}catch(Exception e) {
+				throw Panic.failed2Close(name, e);
+			}
+		}
+	}
 }

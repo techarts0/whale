@@ -45,6 +45,10 @@ public class Factory {
 	
 	private static final Logger LOGGER = Hotpot.getLogger();
 	
+	public Factory(Map<String, Craft> container) {
+		this(container, null);
+	}
+	
 	public Factory(Map<String, Craft> container, Map<String, String> configs) {
 		if(container == null) {
 			throw Panic.nullContainer();
@@ -158,7 +162,9 @@ public class Factory {
 	 */
 	public Factory register(Class<?>... beans) {
 		if(this.launched) return this;
-		return this.register(beans);
+		if(beans == null) return this;
+		if(beans.length == 0) return this;
+		return this.register0(beans);
 	}
 	
 	/**
@@ -208,10 +214,12 @@ public class Factory {
 	}
 	
 	/**
-	 * Append managed objects into context after calling {@link start()}.<p>
+	 * Append managed objects into context after calling {@link start()}.<br>
+	 * The method equals the statement {@code register(classes).start();} <br>
+	 * Dont't call it directly on a factory instance, call the {@link Context.append()} instead. 
 	 */
-	public void append(Class<?>[] classes) {
-		if(crafts.isEmpty()) return;
+	public void append(Class<?>... classes) {
+		if(!material.isEmpty()) return;
 		this.register0(classes);
 		this.assembleAndInstanceCrafts();
 	}
@@ -220,8 +228,6 @@ public class Factory {
 	 * Append a managed bean into IOC container by class.
 	 */
 	private Factory register0(Class<?>... beans) {
-		if(beans == null) return this;
-		if(beans.length == 0) return this;
 		for(var bean : beans) {
 			this.register(bean);
 		}
@@ -313,8 +319,8 @@ public class Factory {
 	}
 	
 	private Factory assembleAndInstanceCrafts() {
-		var start = material.size();
-		if(start == 0) return this; //Assemble Completed
+		var quantity = material.size();
+		if(quantity == 0) return this; //Assemble Completed
 		for(var entry : material.entrySet()) {
 			var craft = entry.getValue();
 			if(!craft.isAssembled()) {
@@ -327,7 +333,7 @@ public class Factory {
 				this.material.remove(key);
 			}
 		}
-		if(start == material.size()){ //Not Empty
+		if(quantity == material.size()){ //Not Empty
 			throw Panic.circularDependence(dump());
 		}
 		return this.assembleAndInstanceCrafts();

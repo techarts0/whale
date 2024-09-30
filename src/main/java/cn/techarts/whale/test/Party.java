@@ -5,7 +5,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
-public class Party {
+public class Party implements AutoCloseable{
 	private int id;
 	private String name;
 	private int memebers;
@@ -21,5 +21,11 @@ public class Party {
 
 	public void setChairman(Person chairman) {
 		this.chairman = chairman;
+	}
+
+	@Override
+	public void close() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }

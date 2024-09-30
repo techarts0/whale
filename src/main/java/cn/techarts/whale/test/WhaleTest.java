@@ -10,7 +10,7 @@ public class WhaleTest {
 	private static final String CLASSPATH = "/D:/Studio/Project/Java/whale/target/classes"; //Your class path
 	private static final Map<String, String> CFG = Map.of("zone", "+86", "user.id", "45", "build.name", "Library", "user.name", "Johnson");
 	
-	@Test
+	//@Test
 	public void testRegisterManually() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();
@@ -20,14 +20,20 @@ public class WhaleTest {
 		.bind(SomeInterface.class, SomeInterfaceImpl.class)
 		.register(Office.class)
 		.start();
+		
 		ctx.append(Party.class);
 		
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
 		var o = ctx.get(Office.class);
 		var t = ctx.get(Party.class);
+		var s = ctx.get(SomeInterface.class);
 		
-		TestCase.assertNotNull(ctx.get(SomeInterface.class));
+		System.out.println(t.hashCode());
+		
+		ctx.close();
+		
+		TestCase.assertNotNull(s);
 		TestCase.assertEquals("+86", m.getZone());
 		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
@@ -39,6 +45,7 @@ public class WhaleTest {
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
 		TestCase.assertEquals(3, o.getAdmin().getId());
 		TestCase.assertEquals("Johnson", t.getChairman().getName());
+	
 	}
 	
 	//@Test

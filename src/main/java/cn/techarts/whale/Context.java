@@ -35,8 +35,13 @@ public class Context implements AutoCloseable{
 	private Map<String, Craft> crafts;
 	private Map<String, String> configs;
 	private boolean factoryCreated = false;
-	public static final String NAME = "context.dragonfly.techarts.cn";
+	public static final String NAME = "context.whale.techarts";
 	private static final Logger LOGGER = Hotpot.getLogger();
+	
+	private Context(Map<String, Craft> container, Map<String, String> configs){
+		this.configs = configs == null ? Map.of() : configs;
+		this.crafts = container == null ? Map.of() : container;
+	}
 	
 	/**
 	 * Construct an empty context.
@@ -49,9 +54,9 @@ public class Context implements AutoCloseable{
 	/**
 	 * Construct a context with configuration path.
 	 */
-	public static Context make(String config) {
+	public static Context make(String configPath) {
 		var container = new HashMap<String, Craft>(256);
-		var configs = Hotpot.resolveProperties(config);
+		var configs = Hotpot.resolveProperties(configPath);
 		return new Context(container, configs);
 	}
 	
@@ -73,25 +78,35 @@ public class Context implements AutoCloseable{
 	}
 	
 	/**
+	 * Clean up all managed objects and restore the initial state.
+	 * you should call {@link createFactory} to rebuild these beans.
+	 */
+	public Context reset() {
+		if(factoryCreated) {
+			this.cleanup();
+			factoryCreated = false;
+		}
+		return this;
+	}
+	
+	/**
 	 * Retrieve the context from SERVLET context.(Web Application)
 	 */
 	public static Context from(ServletContext context) {
+		if(context == null) return null;
 		var obj = context.getAttribute(NAME);
 		if(obj == null) return null;
 		if(!(obj instanceof Context)) return null;
 		return (Context)obj;
 	}
 	
-	Context(Map<String, Craft> container, Map<String, String> configs){
-		this.configs = configs == null ? Map.of() : configs;
-		this.crafts = container == null ? Map.of() : container;
-	}
-	
 	/**
-	 * Append managed objects while context initialized.
+	 * Append managed objects after context initialized.
 	 */
 	public void append(Class<?>... classes) {
-		new Factory(crafts, configs).append(classes);
+		if(factoryCreated == false) return;
+		if(classes == null || classes.length == 0) return;
+		new Factory(this.crafts, this.configs).append(classes);
 	}
 	
 	/**
@@ -123,7 +138,9 @@ public class Context implements AutoCloseable{
 		return get(clazz.getName(), clazz);
 	}
 	
-	/**Export the configuration the container held.*/
+	/**
+	 * Export the configuration the container held.
+	 */
 	public String getConfig(String key) {
 		if(key == null) return null;
 		if(configs == null) return null;
@@ -134,26 +151,26 @@ public class Context implements AutoCloseable{
 	 * Cache the IOC context into  SERVLET context.
 	 */
 	public Context cache(ServletContext context) {
+		if(context == null) return this;
 		context.setAttribute(NAME, this);
 		return this;
 	}
 	
 	@Override
 	public void close() {
+		this.cleanup();
+		this.crafts = null;
+		this.configs = null;
+		LOGGER.info("The whale context has been cleaned up.");
+	}
+	
+	private void cleanup() {
 		if(crafts == null) return;
 		if(crafts.isEmpty()) return;
 		for(var craft : crafts.values()) {
-			var obj = craft.getInstance();
-			if(obj == null) continue;
-			if(obj instanceof AutoCloseable) {
-				try {
-					((AutoCloseable)obj).close();
-				}catch(Exception e) {
-					LOGGER.severe("Failed to close " + craft.getName() + ": " + e.getMessage());
-				}
-			}
+			craft.destroy();
 		}
 		this.crafts.clear();
-		this.configs.clear();
 	}
+	
 }
