@@ -17,6 +17,7 @@
 package cn.techarts.whale.util;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,5 +70,15 @@ public class Scanner {
 		}catch(IOException e) {
 			throw new RuntimeException("Failed to scan the jar file.", e);
 		}
+	}
+}
+
+class ClassFilter implements FileFilter
+{
+	public boolean accept(File file){
+		if(file == null) return false;
+		if(file.isDirectory()) return true;
+		var name =file.getName().toLowerCase();
+		return name.endsWith(".class");
 	}
 }

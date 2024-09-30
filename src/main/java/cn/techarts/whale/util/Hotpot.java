@@ -17,8 +17,6 @@
 package cn.techarts.whale.util;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -297,15 +295,5 @@ public final class Hotpot {
 		}catch(IOException e){
 			throw new RuntimeException("Fail to load the ini file", e);
 		}
-	}
-}
-
-class ClassFilter implements FileFilter
-{
-	public boolean accept(File file){
-		if(file == null) return false;
-		if(file.isDirectory()) return true;
-		var name =file.getName().toLowerCase();
-		return name.endsWith(".class");
 	}
 }
