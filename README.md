@@ -391,6 +391,64 @@ Whale offers the flexibility to append managed objects into DI container even af
 
 If the append() method is invoked before the start() method, whale will disregard the call.
 
+### C. Customized Qualifier Annotation
+
+As mentioned earlier, the Qualifier is a meta-annotation, so it cannot be used directly. Developers can create custom annotations that extend from it. Let's illustrate this with an example:
+
+```java
+//User defines two qualifier annotations
+//The first
+@Qualifier
+@Documented
+@Retention(RUNTIME)
+public @interface Cat {
+}
+
+//The second
+@Qualifier
+@Documented
+@Retention(RUNTIME)
+public @interface Dog {
+}
+
+//Declare an interface
+public interface Animal{
+	public String howl();
+}
+
+//There are 2 implements of above interface: Cat and Dog
+@Cat
+public class Cat implements Animal{
+	public String howl(){
+		return "Miao Miao";
+	}
+}
+
+@Dog
+public class Dog implements Animal{
+	public String howl(){
+		return "Wang Wang";
+	}
+}
+
+// The class Family dependents on the implementation Cat and Dog
+public class Family{
+	private Person father;
+	private Person mother;
+    private Person child;
+	
+    @Inject
+    @Cat
+    private Animal cat;
+    
+    @Inject
+    @Dog
+    private Animal dog;
+}
+```
+
+Whale will seamlessly inject the correct implementation into the `cat` and `dog` properties, eliminating the need for verbose configuration. While the Bind annotation associates an implementation with an interface, it's not well-suited for scenarios with multiple implementations. Custom Qualifiers provide a more effective way to specify and inject different implementations, offering a more elegant solution.
+
 ## 6. Web Application
 
 The WebListener class enables the intergation of whale into a web application. Please add a listener declaration(using the listener tag) in web.xml file:
