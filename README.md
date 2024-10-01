@@ -378,7 +378,7 @@ factory.bind(DemoService.class, DemoServiceImpl.class);
 
 To summarize, the Bind annotation provides a straightforward way for mapping an abstraction (interface or abstract class) to its concrete implementation, simplifying the dependence configuration.
 
-B. Append Managed Object
+### B. Append Managed Object
 
 Whale offers the flexibility to append managed objects into DI container even after the container has been initialized.
 
