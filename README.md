@@ -3,7 +3,6 @@
 # Whale: A JSR330 Based Java DI Container
 
 ## 1. Summary
-
 Whale is a lightweight dependence Injection(DI) container that fully implements JSR330. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
 
 ## 2. Annotations
@@ -28,7 +27,6 @@ Whale supports three dependence types:
 
 
 ## 3. Basic Usage
-
 Whale offers four approaches for managing the dependencies between Java objects. To illustrate these methods, let's examine some sample test code. We'll assume the test code is located in the directory on the classpath: "**/tmp/project/demo/bin**".
 
 - The Class Person dependents on the class Mobile, a given number value and some configurations:
@@ -63,7 +61,6 @@ public class Person{
     //Getters and Setters
 }
 ```
-
 - The class Mobile dependents on two keys from configuration and is injected via the constructor:
 
 
@@ -97,12 +94,13 @@ mobile.number=13603166666
 - or some static test data:
 
 
-```
+```java
 public class TestData{
-	public static final Map<String, String> CONFIGS = Map.of("user.age", "18",
-														"user.name", "John Denver", 
-                                                        	 "mobile.area", "+86", 
-                                                        	 "mobile.number", "13603166666");
+	public static final Map<String, String>
+	CONFIGS = Map.of("user.age", "18",
+					"user.name", "John Denver", 
+             		 "mobile.area", "+86", 
+             		 "mobile.number", "13603166666");
 }
 ```
 
@@ -164,11 +162,8 @@ public class WhaleTest{
         TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 ```
-
 ### C. Load classes and dependencies from a given JAR file:
-
 We assume to packed these 2 classes into a JAR file "/tmp/project/demo/lib/demo.jar"
-
 ```
     @Test
     public void testLoadFromJAR(){
@@ -185,11 +180,9 @@ We assume to packed these 2 classes into a JAR file "/tmp/project/demo/lib/demo.
     	TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 ```
-
 ### D.  Parse the XML Definition (beans.xml)
 
 If you are a Spring Framework developer, you will be very familiar with XML configuration. Whale also supports you defining the manged objects in the XML file located in "**/tmp/project/demo/beans.xml**":
-
 ```xml
 <beans>
 	<bean id="person" singleton="true" type="whale.demo.Person">
@@ -212,7 +205,6 @@ If you are a Spring Framework developer, you will be very familiar with XML conf
 	</bean>
 </beans> 
 ```
-
 Please note that XML definition just supports field injection(using the props tag), constructor injection(using the args tag) and method injection(using the methods tag). For the constructor and method injection, you must explicitily declare the parameter types. Othewise, whale may not be able to correctly identify overloaded methods in certain situations. For example:
 
 ```java
@@ -249,9 +241,7 @@ More advanced features are forbidden because it makes the XML schema very ugly.
         TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 ```
-
 You can actually pass multiple XML definitions to the method parse. For example:
-
 ```java
     factory.parse("/tmp/project/demo/beans-1.xml", "/tmp/project/demo/beans-2.xml");
 ```
@@ -269,9 +259,7 @@ private Mobile mobie;
 @Inject
 private Person owner;
 ```
-
 Whale cannot assemble the above 2 objects and throws an exception "Circular dependent is detected". We can refactor it using Provider interface as following:
-
 ```java
 // In class Person:
 @Inject
@@ -285,7 +273,6 @@ private Provider<Person> owner;
 var name = mobile.getOwner().get().getName();
 var code = person.getMobile().get().getAreaCode();
 ```
-
 Now, it works correctly. Please note that you should avoid calling the method Provider.get() directly within constructor or other method injection, Doing so can lead to unexpected behavior:
 
 ```java
@@ -413,9 +400,7 @@ The WebListener class enables the intergation of whale into a web application. P
 	<listener-class>cn.techarts.whale.web.WebListener</listener-class>
 </listener>
 ```
-
 Now, you can retrieve the managed objects from the servlet context, as demonstrated below: 
-
 ```java
 public DemoServlet extends HttpServlet{
 	public void init(ServletConfig arg) {
@@ -427,5 +412,4 @@ public DemoServlet extends HttpServlet{
 ```
 
 ## 7. API Documentation
-
 Thank you very much for your support and attention.
