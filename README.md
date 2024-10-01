@@ -1,14 +1,41 @@
-# whale: A JSR330 Based Java IOC Container
+
+
+# Whale: A JSR330 Based Java DI Container
 
 ## 1. Summary
-whale is a lightweight IOC Container that fulfills JSR330. Most of java developers are familiar with spring framework or google guice, we recommend you to try whale.
 
-## 2. Basic Usage
-Whale supports 3 ways to define the dependence of java classes.
-### A. JSR 330 Annotation
+Whale is a lightweight dependence Injection(DI) container that fully implements JSR330. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
 
-```
-package ioc.demo;
+## 2. Annotations
+
+JSR330's appeal lies in its simplicity, consisting of just 4 annotations and one interface. To enhance flexibility, whale adds 2 annotations: Valued and Bind, as follows:
+
+| #    | Annotation | Usage                                                        |
+| ---- | ---------- | ------------------------------------------------------------ |
+| 1    | Inject     | Indicates a field, constructor or method that will be injected with a managed object. |
+| 2    | Named      | Gives the managed object a qualifier name, or tells the injector which will be injected in. |
+| 3    | Valued     | Injects a value(primitive types like int, string, boolean) or a key from configuration file. (Non JSR330) |
+| 4    | Singleton  | There is only one instance of the managed object in DI container. |
+| 5    | Bind       | Relates an interface or abstraction to a specific implementation. (Non JSR330) |
+| 6    | Qualifier  | Meta annotation.                                             |
+| 7    | Provider   | An interface, not an annotation, used for resolving circular dependencies or lazy loading. |
+
+Whale supports three dependence types:
+
+- **REF**: A managed object in container. XML property is ref;
+- **KEY**: A configuration from properties file. XML property is key;
+- **VAL**: A value of primitive type(e. g. int, String, boolean, float), XML property is val;
+
+
+## 3. Basic Usage
+
+Whale offers four approaches for managing the dependencies between Java objects. To illustrate these methods, let's examine some sample test code. We'll assume the test code is located in the directory on the classpath: "**/tmp/project/demo/bin**".
+
+- The Class Person dependents on the class Mobile, a given number value and some configurations:
+
+
+```java
+package whale.demo;
 
 @Named
 @Singleton
@@ -21,15 +48,27 @@ public class Person{
     @Valued(key="user.name") 
     private String name;
     
+    private int age;
+    
     @Inject
     private Mobile mobile;
     
     public Person(){}
 
+    @Inject
+    public void setAge(@Valued(key="user.age")int age){
+        this.age = age;
+    }
+    
     //Getters and Setters
 }
+```
 
-package ioc.demo;
+- The class Mobile dependents on two keys from configuration and is injected via the constructor:
+
+
+```java
+package whale.demo;
 
 @Singleton
 public class Mobile{
@@ -43,104 +82,185 @@ public class Mobile{
     }
     //Getters & Setters
 }
+```
 
-public class JSR330Test{
-    private static Map<String, String> configs = Map.of("user.name", "John", 
-                                                        "mobile.area", "+86", 
-                                                        "mobile.number", "13666666666");
+- To ensure successful testing, we need to prepare a configuration beforehand (/tmp/project/demo/config.properties):
+
+
+```properties
+user.age=18
+user.name=John Denver
+mobile.area=+86
+mobile.number=13603166666
+```
+
+- or some static test data:
+
+
+```
+public class TestData{
+	public static final Map<String, String> CONFIGS = Map.of("user.age", "18",
+														"user.name", "John Denver", 
+                                                        	 "mobile.area", "+86", 
+                                                        	 "mobile.number", "13603166666");
+}
+```
+
+### A.  Scan classpath to resolve the dependencies:
+
+The JUNIT test case as following:
+
+
+```java
+public class WhaleTest{
     @Test
-    public void testInject(){
-        var context = Context.make(configs);
+    public void testScanClasspath(){
+        var context = Context.make(CONFIGS);
+        
+        //Or read configuration from a properties file
+        //var context = Context.make("/tmp/project/demo/config.properties");
+        
         var factory = context.createFactory();
-        factory.register(Person.class).register(Mobile.class);
-        //factory.register("ioc.demo.person").register("ioc.demo.Mobile");
-        //factory.register(Person.class, Mobile.class);
+        factory.scan("/tmp/project/demo/bin");
+        
+        //If you have more than one classpath:
+        //factory.scan("Another classpath");
+        //factory.scan("classpath-1", "class-path2");
+        
         factory.start();
+        
+        //The chain-stype calling is supported:
+        //context.createFactory().scan("/tmp/project/demo/bin").start();
+        
         var person = context.get(Person.class);
         var mobile = context.get(Mobile.class);
-        TestCase.assertEquals("John", person.getName());
+        TestCase.assertEquals("John Denver", person.getName());
+        TestCase.assertEquals(18, person.getAge());
         TestCase.assertEquals("+86", mobile.getAreaCode());
-        TestCase.assertEquals("13666666666", person.getMobile().getNumber());
+        TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 }
 ```
-The @Valued is a not a JSR330 official annotation, but it's very useful.
-We suppose the above 2 classes is under the folder "/usr/project/demo/classes", the framework will scan the classpath to register beans:
+
+### B. Register managed objects manually:
+
+```java
+    @Test
+    public void testRegisterManually(){
+        var context = Context.make(CONFIGS);
+        var factory = context.createFactory();
+        factory.register(Person.class);
+        factory.register(Mobile.class);
+        factory.start();
+        
+        //Chain-style calling:
+        //factory.register(Person.class, Mobile.class).start();
+        
+        var person = context.get(Person.class);
+        var mobile = context.get(Mobile.class);
+        TestCase.assertEquals(18, person.getAge());
+        TestCase.assertEquals("John Denver", person.getName());
+        TestCase.assertEquals("+86", mobile.getAreaCode());
+        TestCase.assertEquals("13603166666", person.getMobile().getNumber());
+    }
+```
+
+### C. Load classes and dependencies from a given JAR file:
+
+We assume to packed these 2 classes into a JAR file "/tmp/project/demo/lib/demo.jar"
 
 ```
     @Test
-    public void testInject(){
-        var context = Context.make(configs);
-        var factory = context.createFactory();
-        factory.scan("/usr/project/demo/classes");
-        factory.start();
-        var person = context.get(Person.class);
-        var mobile = context.get(Mobile.class);
-        TestCase.assertEquals("John", person.getName());
-        TestCase.assertEquals("+86", mobile.getAreaCode());
-        TestCase.assertEquals("13666666666", person.getMobile().getNumber());
+    public void testLoadFromJAR(){
+    	var context = Context.make(CONFIGS);
+    	var factory = context.createFactory();
+    	factory.load("/tmp/project/demo/lib/demo.jar");
+    	factory.start();
+       
+   		var person = context.get(Person.class);
+    	var mobile = context.get(Mobile.class);
+    	TestCase.assertEquals(18, person.getAge());
+     	TestCase.assertEquals("John Denver", person.getName());
+    	TestCase.assertEquals("+86", mobile.getAreaCode());
+    	TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 ```
-Maybe, the classes in the JAR file demo.jar and it's full path is "/usr/project/demo/lib/demo.jar":
 
-```
-    @Test
-    public void testInject(){
-        var context = Context.make(configs);
-        var factory = context.createFactory();
-        factory.load("/usr/project/demo/lib/demo.jar");
-        factory.start();
-        var person = context.get(Person.class);
-        var mobile = context.get(Mobile.class);
-        TestCase.assertEquals("John", person.getName());
-        TestCase.assertEquals("+86", mobile.getAreaCode());
-        TestCase.assertEquals("13666666666", person.getMobile().getNumber());
-    }
-```
-### B. XML Definition(beans.xml)
+### D.  Parse the XML Definition (beans.xml)
 
-If you are a spring-framework developer, the XML configuration is very familiar. Whale allows you define the manged beans in the XML file(beans.xml):
-```
-`<beans>
-    <bean id="person" singleton="true" type="ico.demo.Person">
-        <props>
-	    <prop name="id" val="45" />
-	    <prop name="name" key="user.name" />
-            <prop name="mobile" ref="mobile" />
-	</props>
+If you are a Spring Framework developer, you will be very familiar with XML configuration. Whale also supports you defining the manged objects in the XML file located in "**/tmp/project/demo/beans.xml**":
+
+```xml
+<beans>
+	<bean id="person" singleton="true" type="whale.demo.Person">
+    	<props>
+			<prop name="id" val="45" />
+			<prop name="name" key="user.name" />
+    		<prop name="mobile" ref="mobile" />
+    	</props>
+        <methods>
+        	<method name="setAge">
+            	<arg key="user.age" type="int" />
+            </method>
+        </methods>
     </bean>
-    <bean id="mobile" singleton="true" type="ico.demo.Mobile">
+    <bean id="mobile" singleton="true" type="whale.demo.Mobile">
         <args>
-	    <arg key="mobile.area" type="String" />
-	    <arg key="mobile.number" type="String" />
-	</args>
-    </bean>
-</beans>` 
+	    	<arg key="mobile.area" type="String" />
+	    	<arg key="mobile.number" type="String" />
+	    </args>
+	</bean>
+</beans> 
 ```
-Please note, XML does not support method rejection, because the grammar is to complex and urgly :(
+
+Please note that XML definition just supports field injection(using the props tag), constructor injection(using the args tag) and method injection(using the methods tag). For the constructor and method injection, you must explicitily declare the parameter types. Othewise, whale may not be able to correctly identify overloaded methods in certain situations. For example:
+
+```java
+//In constructor:
+public Student(String studentNumber);
+public Student(int age);
+//How do we correctly explain the value "21" from configuration? 
+
+//In general methods:
+public void setScore(int age);
+public void setScore(float age);
+//We can convert the value "85" to 85(int) or 85.0(float). Which method will be invoked? 
 ```
+
+More advanced features are forbidden because it makes the XML schema very ugly.
+
+```java
     @Test
-    public void testInject(){
-        var context = Context.make(configs);
-        var factory = context.createFactory();
-        factory.parse("/usr/project/demo/classes/beans.xml");
-        factory.start();
-        var person = context.get(Person.class);
+    public void testParseXMLDefinition(){
+    	var context = Context.make(CONFIGS);
+     	var factory = context.createFactory();
+      	factory.parse("/tmp/project/demo/beans.xml");
+      	factory.start();
+       	
+       	//Chain-stype calling
+       	//context.createFactory().parse("/tmp/project/demo/beans.xml").start();
+       	
+       	var person = context.get(Person.class);
         var mobile = context.get(Mobile.class);
-        TestCase.assertEquals("John", person.getName());
+        
+        TestCase.assertEquals(18, person.getAge());
+        TestCase.assertEquals("John Denver", person.getName());
         TestCase.assertEquals("+86", mobile.getAreaCode());
-        TestCase.assertEquals("13666666666", person.getMobile().getNumber());
+        TestCase.assertEquals("13603166666", person.getMobile().getNumber());
     }
 ```
-Actually, you can pass multiple xml definitions to the method parse like the following:
-```
-    factory.parse("/usr/project/demo/classes/beans_1.xml", "/usr/project/demo/classes/beans_2.xml");
+
+You can actually pass multiple XML definitions to the method parse. For example:
+
+```java
+    factory.parse("/tmp/project/demo/beans-1.xml", "/tmp/project/demo/beans-2.xml");
 ```
 
-## 3. Usage of Provider<T>
+## 4. Provider<T>
 
-The biggest benift of Provider interface is resolved the problem of circular dependent. For example:
-```
+The Provider interface  is similar to the **ObjectFactory** in Spring Framework. One of its primary benefits is resolving the circular dependent. For example:
+
+```java
 // In class Person:
 @Inject
 private Mobile mobie;
@@ -148,10 +268,11 @@ private Mobile mobie;
 //In class Mobile
 @Inject
 private Person owner;
+```
 
-```
-The framework will throw an exception "Circular dependent is detected". We can rewrite it using Provider:
-```
+Whale cannot assemble the above 2 objects and throws an exception "Circular dependent is detected". We can refactor it using Provider interface as following:
+
+```java
 // In class Person:
 @Inject
 private Provider<Mobile> mobile;
@@ -161,28 +282,150 @@ private Provider<Mobile> mobile;
 private Provider<Person> owner;
 
 //In test case:
-var code = person.getMobile().get().getAreaCode();
 var name = mobile.getOwner().get().getName();
+var code = person.getMobile().get().getAreaCode();
 ```
-Now, it works correctly.
 
-## 4. Web Application
+Now, it works correctly. Please note that you should avoid calling the method Provider.get() directly within constructor or other method injection, Doing so can lead to unexpected behavior:
 
-The WebListener class provides the ability to integrate whale on a web application. Please add a listener tag in web.xml:
+```java
+private Mobile mobile;
 
+@Inject
+public Person(Provider<Mobile> mobile){
+	this.mobile = mobile.get(); //Here
+}
 ```
+
+A correct approach is as below:
+
+```java
+private Provider<Mobile> mobile;
+
+@Inject
+public Person(Provider<Mobile> mobile){
+	this.mobile = mobile;
+}
+```
+
+More information about Provider please refer to the document on github.
+
+[JSR330]: https://github.com/javax-inject/javax-inject
+
+## 5. Advanced Features
+
+The section describes some advanced features in whale. It helps developers more flexibilities.
+
+### A. Bind Annotation
+
+Please consider the following example code:
+
+```java
+package whale.demo.service;
+
+public interface DemoService{
+	public Object doSomething(Object args);
+}
+
+package whale.demo.service;
+@Singleton
+public class DemoServiceImpl implements DemoService{
+	public Object doSomething(Object args){
+		Object result = handle_your_business();
+		return result;
+	}
+}
+```
+
+Since the interface DemoService can not be instantiated directly, we must register the implementation class DemoServiceImpl as a managed object into DI container.
+
+```java
+//The first approach:
+public class Demo{
+	@Inject
+	@Named("whale.demo.service.DemoServiceImpl")
+	private DemoService service;
+}
+
+//The second approach:
+public class Demo{
+	@Inject
+	private DemoServiceImpl service;
+}
+```
+
+The first approach ontlined above is overly verbose, and the second approach deviates from the principles of Interface-Oriented programming. Bind annotation offers a more concise and elegant way for developer, as demonstrated below:
+
+```java
+package whale.demo.service;
+
+@Bind(target=DemoService.class)
+public interface DemoService{
+	public Object doSomething(Object args);
+}
+
+public class Demo{
+	@Inject
+	private DemoService service;
+}
+```
+
+Certainly, you can call the bind method manually in code:
+
+```java
+factory.bind(DemoService.class, DemoServiceImpl.class);
+```
+
+To summarize, the Bind annotation provides a straightforward way for mapping an abstraction (interface or abstract class) to its concrete implementation, simplifying the dependence configuration.
+
+B. Append Managed Object
+
+Whale offers the flexibility to append managed objects into DI container even after the container has been initialized.
+
+```java
+ @Test
+    public void testAppendBeans(){
+        var context = Context.make(CONFIGS);
+        var factory = context.createFactory();
+        factory.register(Person.class);
+        factory.register(Mobile.class);
+        factory.start(); //Container Initialized
+        
+      	factory.append(DemoServiceImpl.class);
+        
+        var person = context.get(Person.class);
+        var mobile = context.get(Mobile.class);
+        TestCase.assertEquals(18, person.getAge());
+        TestCase.assertEquals("John Denver", person.getName());
+        TestCase.assertEquals("+86", mobile.getAreaCode());
+        TestCase.assertEquals("13603166666", person.getMobile().getNumber());
+    }
+```
+
+If the append() method is invoked before the start() method, whale will disregard the call.
+
+## 6. Web Application
+
+The WebListener class enables the intergation of whale into a web application. Please add a listener declaration(using the listener tag) in web.xml file:
+
+```xml
 <listener>
-    <listener-class>cn.techarts.xkit.ioc.WebListener</listener-class>
-  </listener>
-```
-The IOC context is cached globally into servlet context. 
-```
-//Usage in servlet:
-var servletContext = request.getServletContext();
-var context = Conext.from(servletContext);
-var person = context.get(Person.class);
-var mobile = context.get(Mobile.class);
+	<listener-class>cn.techarts.whale.web.WebListener</listener-class>
+</listener>
 ```
 
-## 5. More Features
-I am writting hard...
+Now, you can retrieve the managed objects from the servlet context, as demonstrated below: 
+
+```java
+public DemoServlet extends HttpServlet{
+	public void init(ServletConfig arg) {
+		var context = Context.from(arg.getServletContext());
+		DemoService service = context.get(DemoSrevice.class);	
+		service.doSomething(context.get(Person.class));
+	}
+}
+```
+
+## 7. API Documentation
+
+Thank you very much for your support and attention.
