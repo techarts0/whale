@@ -471,4 +471,6 @@ public DemoServlet extends HttpServlet{
 
 ## 7. TODO List
 We plan to add the following features:
-- Interceptor and Enhancer annotations
+- Interceptor and Enhancer annotations.
+- Refactor code to improve performance.
+- Fix bugs as soon as they are found.
