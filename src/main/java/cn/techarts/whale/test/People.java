@@ -1,6 +1,7 @@
 package cn.techarts.whale.test;
 
 import javax.inject.Inject;
+//import jakarta.inject.Inject;
 
 import cn.techarts.whale.Valued;
 

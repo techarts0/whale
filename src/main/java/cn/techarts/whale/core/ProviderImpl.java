@@ -16,6 +16,8 @@
 
 package cn.techarts.whale.core;
 
+//import jakarta.inject.Provider;
+
 import javax.inject.Provider;
 
 /**

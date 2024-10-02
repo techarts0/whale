@@ -17,13 +17,26 @@
 package cn.techarts.whale.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 import javax.inject.Named;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
+//import jakarta.inject.Named;
+//import jakarta.inject.Inject;
+//import jakarta.inject.Provider;
+//import jakarta.inject.Qualifier;
+//import jakarta.inject.Singleton;
+
 import cn.techarts.whale.Valued;
 import cn.techarts.whale.util.Hotpot;
+
 
 
 /**
@@ -110,5 +123,25 @@ public class Analyzer {
 	public String getQualifierName() {
 		if(n != null && !n.value().isBlank()) return n.value();
 		return q != null ? q.toString() : this.defaultName;
-	}	
+	}
+	
+	public static boolean isProvider(Field f) {
+		return Provider.class.isAssignableFrom(f.getType());
+	}
+	
+	public static boolean isProvider(Parameter p) {
+		return Provider.class.isAssignableFrom(p.getType());
+	}
+	
+	public static boolean hasInjectAnnotation(Field f) {
+		return f.isAnnotationPresent(Inject.class);
+	}
+	
+	public static boolean hasInjectAnnotation(Constructor<?> c) {
+		return c.isAnnotationPresent(Inject.class);
+	}
+	
+	public static boolean hasInjectAnnotation(Method m) {
+		return m.isAnnotationPresent(Inject.class);
+	}
 }

@@ -24,8 +24,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import cn.techarts.whale.Panic;
 import cn.techarts.whale.util.Hotpot;
 
@@ -358,13 +356,13 @@ public class Craft {
 		if(cons == null || cons.length == 0) return;
 		
 		for(var c : cons) {
-			if(!c.isAnnotationPresent(Inject.class)) continue;
+			if(!Analyzer.hasInjectAnnotation(c)) continue;
 			this.constructor = c; //Cache it for new instance
 			var args = c.getParameters();
 			if(args == null || args.length == 0) break;
 			
 			for(int i = 0; i < args.length; i++) {
-				if(!isProvider(args[i])) {
+				if(!Analyzer.isProvider(args[i])) {
 					var arg = new Injectee(args[i]);
 					arguments.put(Integer.valueOf(i), arg);
 				}else {
@@ -391,14 +389,14 @@ public class Craft {
 		var ms = clazz.getDeclaredMethods();
 		if(ms != null && ms.length != 0) {
 			for(var m : ms) {
-				if(!m.isAnnotationPresent(Inject.class)) continue;
+				if(!Analyzer.hasInjectAnnotation(m)) continue;
 				var args = m.getParameters();
 				if(args == null || args.length == 0) {
 					this.methods.put(m, new Injectee[0]);
 				}else {
 					var params = new Injectee[args.length];
 					for(int i = 0; i < args.length; i++) {
-						if(!isProvider(args[i])) {
+						if(!Analyzer.isProvider(args[i])) {
 							params[i] = new Injectee(args[i]);
 						}else {
 							var type = getGnericType(args[i]);
@@ -418,8 +416,8 @@ public class Craft {
 		var fs = clazz.getDeclaredFields();
 		if(fs != null && fs.length != 0) {
 			for(var f : fs) {
-				if(!f.isAnnotationPresent(Inject.class)) continue;
-				if(!isProvider(f)) {
+				if(!Analyzer.hasInjectAnnotation(f)) continue;
+				if(!Analyzer.isProvider(f)) {
 					this.addProperty(f, new Injectee(f));
 				}else {
 					var type = getGnericType(f);
@@ -429,14 +427,6 @@ public class Craft {
 			}
 		}
 		resolveInjectedFields(clazz.getSuperclass());
-	}
-	
-	private boolean isProvider(Field f) {
-		return Provider.class.isAssignableFrom(f.getType());
-	}
-	
-	private boolean isProvider(Parameter p) {
-		return Provider.class.isAssignableFrom(p.getType());
 	}
 	
 	public String getType() {
