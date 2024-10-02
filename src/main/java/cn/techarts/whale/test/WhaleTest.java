@@ -57,9 +57,9 @@ public class WhaleTest {
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
 		var o = ctx.get(Office.class);
-		var t = ctx.get(Party.class);
 		
 		TestCase.assertNotNull(ctx.get(SomeInterface.class));
+		TestCase.assertNotNull(ctx.get(Party.class));
 		TestCase.assertEquals("+86", m.getZone());
 		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
