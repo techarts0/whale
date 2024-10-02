@@ -40,7 +40,7 @@ public class Injectee {
 	//Is it a Provider<T>?
 	private boolean assembled;
 	
-	public static final int REF = 1, KEY = 2, VAL = 3, PROVIDER = 4;
+	public static final int NON = 0, REF = 1, KEY = 2, VAL = 3, PROVIDER = 4;
 	
 	/**Create a REF object*/
 	public static Injectee ref(String ref) {
@@ -159,23 +159,27 @@ public class Injectee {
 	public void setInjectType(int __t) {
 		this.__t = __t;
 	}
-	
+		
 	public static Injectee of(String ref, String key, String val, String type) {
-		var result = new Injectee(0);
-		if(ref != null && !ref.isEmpty()) {
-			result.setName(ref);
-			result.setInjectType(1);
-		}else if(key != null && !key.isEmpty()) {
-			result.setName(key);
-			result.setInjectType(2);
-		}else if(val != null && !val.isEmpty()) {
-			result.setValue(val);
-			result.setInjectType(3);
-		}
+		var result = new Injectee(NON);
+		
 		if(type != null && !type.isEmpty()) {
 			var ftn = Hotpot.fullTypeName(type);
 			result.setType(Hotpot.forName(ftn));
 		}
+		
+		if(ref != null && !ref.isEmpty()) {
+			result.setName(ref);
+			result.setInjectType(REF);
+		}else if(key != null && !key.isEmpty()) {
+			result.setName(key);
+			result.setInjectType(KEY);
+		}else if(val != null && !val.isEmpty()) {
+			result.setInjectType(VAL);
+			var t = result.getType(); //Maybe NULL
+			result.setValue(Hotpot.cast(val, t));
+		}
+		
 		return result;
 	}
 }

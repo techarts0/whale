@@ -78,15 +78,15 @@ public class Craft {
 		this.resolveInjectedContructor(clazz);
 	}
 	
-	public boolean isManaged() {
-		if(!arguments.isEmpty()) {
-			return true;
-		}
-		if(!properties.isEmpty()) {
-			return true;
-		}
-		return !methods.isEmpty();
-	}
+//	public boolean isManaged() {
+//		if(!arguments.isEmpty()) {
+//			return true;
+//		}
+//		if(!properties.isEmpty()) {
+//			return true;
+//		}
+//		return !methods.isEmpty();
+//	}
 	
 	/**
 	 * Set dependent crafts (REF, KEY, VAL, PROVIDER) before assembling.
@@ -478,7 +478,6 @@ public class Craft {
 		if(instance instanceof AutoCloseable) {
 			try {
 				((AutoCloseable)instance).close();
-				System.out.println("destroy " +  instance.hashCode());
 				this.instance = null;
 			}catch(Exception e) {
 				throw Panic.failed2Close(name, e);

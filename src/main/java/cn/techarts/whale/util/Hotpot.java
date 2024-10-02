@@ -37,8 +37,9 @@ import cn.techarts.whale.Panic;
 public final class Hotpot {
 	
 	public static Object cast(Object v, Type t) {
+		if(t == null) return v;
 		if(!(v instanceof String)) {
-			return null;
+			return v;
 		}
 		return cast(t, (String)v);
 	}

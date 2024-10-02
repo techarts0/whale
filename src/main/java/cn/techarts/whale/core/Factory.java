@@ -235,6 +235,7 @@ public class Factory {
 	}
 	
 	private void appendMaterial(Craft craft) {
+		if(craft == null) return;
 		var name = craft.getName();
 		material.put(name, craft);
 		var bind = binders.get(name);
@@ -247,13 +248,13 @@ public class Factory {
 		if(clzz == null) return;
 		var result = toCraft(clzz);
 		if(result == null) return;
-		if(!result.isManaged()) return;
 		this.appendMaterial(result);
 	}
 	
 	private void register(Object bean) {
 		if(bean == null) return;
 		var result = toCraft(bean.getClass());
+		if(result == null) return;
 		result.setInstance(bean);
 		this.appendMaterial(result);
 	}
@@ -280,6 +281,7 @@ public class Factory {
 	private Craft toCraft(Class<?> clazz) {
 		if(isBinder(clazz) || !Hotpot.newable(clazz)) return null;
 		var analyzer = new Analyzer(clazz.getAnnotations(), 2, clazz.getName());
+		if(!analyzer.isManagedObject()) return null; //Must declare Explicitly
 		return new Craft(analyzer.getQualifierName(), clazz, analyzer.isSingleton());			
 	}
 	

@@ -8,9 +8,10 @@ import junit.framework.TestCase;
 
 public class WhaleTest {
 	private static final String CLASSPATH = "/D:/Studio/Project/Java/whale/target/classes"; //Your class path
-	private static final Map<String, String> CFG = Map.of("zone", "+86", "user.id", "45", "build.name", "Library", "user.name", "Johnson");
+	private static final Map<String, String> CFG = Map.of("zone", "+86", "user.id", "45", 
+			"build.name", "Library", "user.name", "Johnson", "party.name", "Republic");
 	
-	//@Test
+	@Test
 	public void testRegisterManually() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();
@@ -29,11 +30,10 @@ public class WhaleTest {
 		var t = ctx.get(Party.class);
 		var s = ctx.get(SomeInterface.class);
 		
-		System.out.println(t.hashCode());
-		
 		ctx.close();
 		
 		TestCase.assertNotNull(s);
+		TestCase.assertNotNull(t);
 		TestCase.assertEquals("+86", m.getZone());
 		TestCase.assertEquals(33, p.getService().getValue());
 		TestCase.assertEquals(45, m.getContact().getId());
@@ -44,15 +44,16 @@ public class WhaleTest {
 		TestCase.assertEquals("Library", p.getOffice().getBuilding());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
 		TestCase.assertEquals(3, o.getAdmin().getId());
-		TestCase.assertEquals("Johnson", t.getChairman().getName());
-	
 	}
 	
-	//@Test
+	@Test
 	public void testScanClasspath() {
 		var ctx = Context.make(CFG);
+		
 		var factory = ctx.createFactory();
+		
 		factory.scan(CLASSPATH).start();
+		
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
 		var o = ctx.get(Office.class);
@@ -67,7 +68,25 @@ public class WhaleTest {
 		TestCase.assertEquals("13980092699", o.getMobile().getNumber());
 		TestCase.assertEquals("Library", p.getOffice().getBuilding());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
-		TestCase.assertEquals("+86", o.getAdmin().getId());
-		TestCase.assertEquals("Johnson", t.getChairman().getName());
+		TestCase.assertEquals(3, o.getAdmin().getId());
+	}
+	
+	@Test
+	public void testParseXML() {
+		var ctx = Context.make(CFG);
+		var factory = ctx.createFactory();
+		factory.parse("D:\\Studio\\Project\\Java\\whale\\src\\main\\java\\cn\\techarts\\whale\\test\\beans.xml");
+		factory.start();
+		
+		
+		//var p = ctx.get(Person.class);
+		var t = ctx.get("party", Party.class);
+		
+		ctx.close();
+		TestCase.assertEquals(333, t.getId());
+		TestCase.assertEquals(1000, t.getMemebers());
+		TestCase.assertEquals("Republic", t.getName());
+		TestCase.assertEquals("Trump", t.getChairman().getName());
+	
 	}
 }

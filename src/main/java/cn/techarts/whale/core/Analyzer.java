@@ -41,6 +41,12 @@ public class Analyzer {
 	private String defaultName = null;
 	private boolean singleton = false;
 	
+	public boolean isManagedObject() {
+		if(q != null) return true;
+		if(singleton) return true;
+		return n != null ? true : false;
+	}
+	
 	public Analyzer(Annotation[] args, int phase) {
 		if(args == null) return;
 		for(var anno : args) {
