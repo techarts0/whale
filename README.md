@@ -469,7 +469,7 @@ public DemoServlet extends HttpServlet{
 }
 ```
 
-## 7. TODO List
+## 7. Todo List
 We plan to add the following features:
 - Interceptor and Enhancer annotations.
 - Refactor code to improve performance.
