@@ -3,7 +3,7 @@
 # Whale: A JSR330 Based Java DI Container
 
 ## 1. Summary
-Whale is a lightweight dependence Injection(DI) container that fully implements JSR330. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
+Whale is a lightweight dependence Injection(DI) container that fully implements JSR330, and supports  **javax.inject**  and  **jakarta.inject**  API both. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
 
 ## 2. Annotations
 
