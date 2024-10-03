@@ -5,8 +5,8 @@
 [![Generic badge](https://img.shields.io/badge/Dependence_Injection-FFFF00.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/IOC-009ACD.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/JSR330-0000CD.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/Java_EE_API-javax.inject-F4A460.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/Jakarta_EE_API-jakarta.inject-FF4040.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Java_EE_API-F4A460.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Jakarta_EE_API-FF4040.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/Lightweight-00008B.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/High_Performance-0000FF.svg)](https://shields.io/)
 
