@@ -1,7 +1,7 @@
 # Whale: A JSR330 Based Java DI Framework
 
 [![Generic badge](https://img.shields.io/badge/Active-00EE00.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/JAVA-8A2BE2.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/JAVA_11_Later-8A2BE2.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/Dependence_Injection-FFFF00.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/IOC-009ACD.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/JSR330-0000CD.svg)](https://shields.io/)
