@@ -2,7 +2,7 @@
 
 [![Generic badge](https://img.shields.io/badge/Active-00EE00.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/JAVA-8A2BE2.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/Dependence_Injection-A020F0.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Dependence_Injection-FFFF00.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/IOC-009ACD.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/JSR330-0000CD.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/Java_EE_API-javax.inject-F4A460.svg)](https://shields.io/)
