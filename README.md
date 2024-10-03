@@ -7,7 +7,7 @@
 [![Generic badge](https://img.shields.io/badge/JSR330-0000CD.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/Java_EE_API-javax.inject-F4A460.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/Jakarta_EE_API-jakarta.inject-FF4040.svg)](https://shields.io/)
-[![Generic badge](https://img.shields.io/badge/Lightweight-High_Performance-FF0000.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Lightweight-High_Performance-696969.svg)](https://shields.io/)
 
 
 ## 1. Summary
