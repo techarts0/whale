@@ -2,6 +2,8 @@
 
 [![Generic badge](https://img.shields.io/badge/<Language>-<JAVA>-<Green>.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/<Specification>-<JSR330>-<RED>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/<API>-<javax.inject>-<blue>.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/<API>-<jakarta.inject>-<yellow>.svg)](https://shields.io/)
 
 ## 1. Summary
 Whale is a lightweight dependence Injection(DI) container that fully implements JSR330, and supports  **javax.inject**  and  **jakarta.inject**  API both. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
