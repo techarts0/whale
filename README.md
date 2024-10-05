@@ -1,6 +1,15 @@
+# Whale: A JSR330 Based Java DI Framework
 
+[![Generic badge](https://img.shields.io/badge/Active-00EE00.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/JAVA_11+-8A2BE2.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Dependence_Injection-FFFF00.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/IOC-009ACD.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/JSR330-0000CD.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Java_EE_API-F4A460.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Jakarta_EE_API-FF4040.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Lightweight-00008B.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/High_Performance-0000FF.svg)](https://shields.io/)
 
-# Whale: A JSR330 Based Java DI Container
 
 ## 1. Summary
 Whale is a lightweight dependence Injection(DI) container that fully implements JSR330, and supports  **javax.inject**  and  **jakarta.inject**  API both. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
@@ -469,5 +478,8 @@ public DemoServlet extends HttpServlet{
 }
 ```
 
-## 7. API Documentation
-Thank you very much for your support and attention.
+## 7. Todo List
+We plan to add the following features:
+- Interceptor and Enhancer annotations.
+- Refactor code to improve performance.
+- Fix bugs as soon as they are found.
