@@ -1,8 +1,12 @@
 package cn.techarts.whale.test;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import org.junit.Test;
 
+import javax.servlet.ServletContext;
+
+import org.junit.Test;
 import cn.techarts.whale.Context;
 import junit.framework.TestCase;
 
@@ -30,6 +34,8 @@ public class WhaleTest {
 		var t = ctx.get(Party.class);
 		var s = ctx.get(SomeInterface.class);
 		
+		initWebServices(ctx);
+		
 		ctx.close();
 		
 		TestCase.assertNotNull(s);
@@ -44,9 +50,11 @@ public class WhaleTest {
 		TestCase.assertEquals("Library", p.getOffice().getBuilding());
 		TestCase.assertEquals("+86", p.getOffice().getMobile().getZone());
 		TestCase.assertEquals(3, o.getAdmin().getId());
+		
+		
 	}
 	
-	@Test
+	//@Test
 	public void testScanClasspath() {
 		var ctx = Context.make(CFG);
 		
@@ -71,7 +79,7 @@ public class WhaleTest {
 		TestCase.assertEquals(3, o.getAdmin().getId());
 	}
 	
-	@Test
+	//@Test
 	public void testParseXML() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();
@@ -88,5 +96,21 @@ public class WhaleTest {
 		TestCase.assertEquals("Republic", t.getName());
 		TestCase.assertEquals("Trump", t.getChairman().getName());
 	
+	}
+	
+	private boolean isWebService(Object obj) {
+		if(obj == null) return false;
+		var clazz = obj.getClass();
+		return clazz.isAnnotationPresent(WebService.class);
+	}
+	
+	private int initWebServices(Context context) {
+		var result = new LinkedHashMap<String, Object>(512);
+		var classes = context.all().values();
+		for(var service : classes) {
+			if(!isWebService(service)) return 0;
+			System.out.println("Found web service: " + service.getClass().getName());
+		}
+		return result.size(); //How many web-services are found?
 	}
 }

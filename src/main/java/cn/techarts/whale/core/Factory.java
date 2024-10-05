@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -154,6 +155,16 @@ public class Factory {
 		if(beans.length == 0) return this;
 		for(var bean : beans) {
 			this.register(bean);
+		}
+		return this;
+	}
+	
+	public Factory register(List<String> classes) {
+		if(this.launched) return this;
+		if(classes == null) return this;
+		if(classes.isEmpty()) return this;
+		for(var clazz : classes) {
+			this.register(clazz);
 		}
 		return this;
 	}

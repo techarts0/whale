@@ -132,10 +132,31 @@ public class Context implements AutoCloseable{
 	}
 	
 	/**
+	 * Get the managed object from context without exception.
+	 */
+	public Object silent(String name) {
+		if(name == null) return null;
+		var craft = crafts.get(name);
+		if(craft == null) return null;
+		return craft.getInstance();
+	}
+	
+	/**
 	 * Get the managed object without qualifier name.
 	 */
 	public<T> T get(Class<T> clazz) {
 		return get(clazz.getName(), clazz);
+	}
+	
+	public Map<String, Object> all(){
+		if(this.crafts == null) return Map.of();
+		if(this.crafts.isEmpty()) return Map.of();
+		var result = new HashMap<String, Object>();
+		for(var entry : crafts.entrySet()) {
+			var val = entry.getValue();
+			result.put(entry.getKey(), val.getInstance());
+		}
+		return result;
 	}
 	
 	/**

@@ -9,6 +9,7 @@ import javax.inject.Named;
 import cn.techarts.whale.Valued;
 
 @Named
+@WebService
 public class SomeInterfaceImpl implements SomeInterface {
 	
 	private int val;
