@@ -34,8 +34,6 @@ public class WhaleTest {
 		var t = ctx.get(Party.class);
 		var s = ctx.get(SomeInterface.class);
 		
-		initWebServices(ctx);
-		
 		ctx.close();
 		
 		TestCase.assertNotNull(s);
@@ -96,21 +94,5 @@ public class WhaleTest {
 		TestCase.assertEquals("Republic", t.getName());
 		TestCase.assertEquals("Trump", t.getChairman().getName());
 	
-	}
-	
-	private boolean isWebService(Object obj) {
-		if(obj == null) return false;
-		var clazz = obj.getClass();
-		return clazz.isAnnotationPresent(WebService.class);
-	}
-	
-	private int initWebServices(Context context) {
-		var result = new LinkedHashMap<String, Object>(512);
-		var classes = context.all().values();
-		for(var service : classes) {
-			if(!isWebService(service)) return 0;
-			System.out.println("Found web service: " + service.getClass().getName());
-		}
-		return result.size(); //How many web-services are found?
 	}
 }
