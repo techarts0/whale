@@ -280,18 +280,20 @@ public class Factory {
 		this.appendMaterial(craft);
 	}
 	
-	private boolean isBinder(Class<?> clazz) {
+	private void ifBindAnnotaionPresents(Class<?> clazz) {
 		var bind = clazz.getAnnotation(Bind.class);
-		if(bind == null) return false;
-		var src = bind.value();
-		if(src.isBlank()) src = clazz.getName();
+		if(bind == null) return;
+		var src = clazz.getName();
+		if(bind.value() != Bind.class) {
+			src = bind.value().getName();
+		}
 		binders.put(bind.target().getName(), src);
-		return true;
 	}
 	
 	private Craft toCraft(Class<?> clazz) {
-		if(isBinder(clazz) || !Hotpot.newable(clazz)) return null;
-		var analyzer = new Analyzer(clazz.getAnnotations(), 2, clazz.getName());
+		ifBindAnnotaionPresents(clazz);
+		if(!Hotpot.newable(clazz)) return null;
+		var analyzer = new Analyzer(clazz.getDeclaredAnnotations(), 2, clazz.getName());
 		if(!analyzer.isManagedObject()) return null; //Must declare Explicitly
 		return new Craft(analyzer.getQualifierName(), clazz, analyzer.isSingleton());			
 	}

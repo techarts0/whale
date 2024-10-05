@@ -38,7 +38,7 @@ public @interface Bind {
 	/**
 	 * An interface or abstract class.
 	 */
-	public String value() default "";
+	public Class<?> value() default Bind.class;
 	
 	/**
 	 * An implementation class.

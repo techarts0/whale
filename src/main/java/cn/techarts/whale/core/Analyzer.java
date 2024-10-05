@@ -37,8 +37,6 @@ import javax.inject.Singleton;
 import cn.techarts.whale.Valued;
 import cn.techarts.whale.util.Hotpot;
 
-
-
 /**
  * Analyze the annotations of the given class. 
  * It iterates each annotation to find the required metadata.<p>
