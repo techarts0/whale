@@ -363,7 +363,7 @@ public interface DemoService{
 Or, 
 
 @Singleton
-@Bind(value=Demoservice.class, target="DemoServiceImpl")
+@Bind(value=Demoservice.class, target=DemoServiceImpl.class)
 public class DemoServiceImpl implements DemoService{
 	public Object doSomething(Object args){
 		Object result = handle_your_business();
