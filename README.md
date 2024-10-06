@@ -360,6 +360,17 @@ public interface DemoService{
 	public Object doSomething(Object args);
 }
 
+Or, 
+
+@Singleton
+@Bind(value=Demoservice.class, target="DemoServiceImpl")
+public class DemoServiceImpl implements DemoService{
+	public Object doSomething(Object args){
+		Object result = handle_your_business();
+		return result;
+	}
+}
+
 public class Demo{
 	@Inject
 	private DemoService service;
