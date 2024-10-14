@@ -21,6 +21,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarFile;
 
 /**
@@ -58,7 +59,7 @@ public class Scanner {
 		var result = new ArrayList<String>();
 		try(JarFile jar = new JarFile(new File(path))) {
 	       var entries = jar.entries();
-	        if(entries == null) return result;
+	        if(Objects.isNull(entries)) return result;
 	        while(entries.hasMoreElements()) {
 	            var entry = entries.nextElement();
 	            var name = entry.getName();
@@ -76,7 +77,7 @@ public class Scanner {
 class ClassFilter implements FileFilter
 {
 	public boolean accept(File file){
-		if(file == null) return false;
+		if(Objects.isNull(file)) return false;
 		if(file.isDirectory()) return true;
 		var name =file.getName().toLowerCase();
 		return name.endsWith(".class");

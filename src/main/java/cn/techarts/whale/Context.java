@@ -17,6 +17,7 @@
 package cn.techarts.whale;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.HashMap;
 
@@ -39,8 +40,8 @@ public class Context implements AutoCloseable{
 	private static final Logger LOGGER = Hotpot.getLogger();
 	
 	private Context(Map<String, Craft> container, Map<String, String> configs){
-		this.configs = configs == null ? Map.of() : configs;
-		this.crafts = container == null ? Map.of() : container;
+		this.configs = Objects.isNull(configs) ? Map.of() : configs;
+		this.crafts = Objects.isNull(container) ? Map.of() : container;
 	}
 	
 	/**
@@ -93,9 +94,9 @@ public class Context implements AutoCloseable{
 	 * Retrieve the context from SERVLET context.(Web Application)
 	 */
 	public static Context from(ServletContext context) {
-		if(context == null) return null;
+		if(Objects.isNull(context)) return null;
 		var obj = context.getAttribute(NAME);
-		if(obj == null) return null;
+		if(Objects.isNull(obj)) return null;
 		if(!(obj instanceof Context)) return null;
 		return (Context)obj;
 	}
@@ -105,7 +106,7 @@ public class Context implements AutoCloseable{
 	 */
 	public void append(Class<?>... classes) {
 		if(factoryCreated == false) return;
-		if(classes == null || classes.length == 0) return;
+		if(Hotpot.isNull(classes)) return;
 		new Factory(this.crafts, this.configs).append(classes);
 	}
 	
@@ -121,11 +122,11 @@ public class Context implements AutoCloseable{
 	 * Get the managed object from the context.
 	 */
 	public Object get(String name) {
-		if(name == null) {
+		if(Objects.isNull(name)) {
 			throw Panic.nullName();
 		}
 		var craft = crafts.get(name);
-		if(craft == null) {
+		if(Objects.isNull(craft)) {
 			throw Panic.classNotFound(name);
 		}
 		return craft.getInstance();
@@ -135,9 +136,9 @@ public class Context implements AutoCloseable{
 	 * Get the managed object from context without exception.
 	 */
 	public Object silent(String name) {
-		if(name == null) return null;
+		if(Objects.isNull(name)) return null;
 		var craft = crafts.get(name);
-		if(craft == null) return null;
+		if(Objects.isNull(craft)) return null;
 		return craft.getInstance();
 	}
 	
@@ -145,11 +146,11 @@ public class Context implements AutoCloseable{
 	 * Get the managed object from context without exception.
 	 */
 	public<T> T silent(String name, Class<T> clazz) {
-		if(name == null) return null;
+		if(Objects.isNull(name)) return null;
 		var craft = crafts.get(name);
-		if(craft == null) return null;
+		if(Objects.isNull(craft)) return null;
 		var result = craft.getInstance();
-		if(result == null) return null;
+		if(Objects.isNull(result)) return null;
 		return clazz.cast(result);
 	}
 	
@@ -157,12 +158,12 @@ public class Context implements AutoCloseable{
 	 * Get the managed object from context without exception.
 	 */
 	public<T> T silent(Class<T> clazz) {
-		if(clazz == null) return null;
+		if(Objects.isNull(clazz)) return null;
 		var name = clazz.getName();
 		var craft = crafts.get(name);
-		if(craft == null) return null;
+		if(Objects.isNull(craft)) return null;
 		var result = craft.getInstance();
-		if(result == null) return null;
+		if(Objects.isNull(result)) return null;
 		return clazz.cast(result);
 	}
 	
@@ -174,7 +175,7 @@ public class Context implements AutoCloseable{
 	}
 	
 	public Map<String, Object> all1(){
-		if(this.crafts == null) return Map.of();
+		if(Objects.isNull(crafts)) return Map.of();
 		if(this.crafts.isEmpty()) return Map.of();
 		var result = new HashMap<String, Object>();
 		for(var entry : crafts.entrySet()) {
@@ -188,8 +189,8 @@ public class Context implements AutoCloseable{
 	 * Export the configuration the container held.
 	 */
 	public String getConfig(String key) {
-		if(key == null) return null;
-		if(configs == null) return null;
+		if(Objects.isNull(key)) return null;
+		if(Objects.isNull(configs)) return null;
 		return this.configs.get(key);
 	}
 	
@@ -197,7 +198,7 @@ public class Context implements AutoCloseable{
 	 * Cache the IOC context into  SERVLET context.
 	 */
 	public Context cache(ServletContext context) {
-		if(context == null) return this;
+		if(Objects.isNull(context)) return this;
 		context.setAttribute(NAME, this);
 		return this;
 	}
@@ -211,8 +212,7 @@ public class Context implements AutoCloseable{
 	}
 	
 	private void cleanup() {
-		if(crafts == null) return;
-		if(crafts.isEmpty()) return;
+		if(Hotpot.isNull(crafts)) return;
 		for(var craft : crafts.values()) {
 			craft.destroy();
 		}

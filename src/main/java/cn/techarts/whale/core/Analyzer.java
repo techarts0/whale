@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Objects;
 
 import javax.inject.Named;
 import javax.inject.Inject;
@@ -59,7 +60,7 @@ public class Analyzer {
 	}
 	
 	public Analyzer(Annotation[] args, int phase) {
-		if(args == null) return;
+		if(Objects.isNull(args)) return;
 		for(var anno : args) {
 			if(anno instanceof Singleton) {
 				this.setSingleton(true);

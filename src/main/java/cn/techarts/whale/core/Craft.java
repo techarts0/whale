@@ -24,6 +24,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 import cn.techarts.whale.Panic;
 import cn.techarts.whale.util.Hotpot;
 
@@ -108,10 +110,9 @@ public class Craft {
 				if(craft != null) arg.setValue(craft.getInstance());
 			}else {	//Provider
 				var craft = crafts.get(arg.getName());
-				if(craft == null) { //Circular dependence
+				if(Objects.isNull(craft)) { //Circular dependence
 					craft = materials.get(arg.getName());
-				}
-				if(craft != null) {
+				}else{
 					var type = (Class<?>)arg.getType();
 					arg.setValue(new ProviderImpl<>(type, craft));
 				}
@@ -132,10 +133,9 @@ public class Craft {
 					if(craft != null) arg.setValue(craft.getInstance());
 				}else {	//Provider
 					var craft = crafts.get(arg.getName());
-					if(craft == null) { //Circular dependence
+					if(Objects.isNull(craft)) { //Circular dependence
 						craft = materials.get(arg.getName());
-					}
-					if(craft != null) {
+					}else{
 						var type = (Class<?>)arg.getType();
 						arg.setValue(new ProviderImpl<>(type, craft));
 					}
@@ -151,7 +151,7 @@ public class Craft {
 			if(field.completed()) continue; //The value set already.
 			if(field.isKEY()) { //Key here
 				var v = configs.get(field.getName());
-				if(v == null) {
+				if(Objects.isNull(v)) {
 					throw Panic.configKeyMissing(field.getName());
 				}
 				field.setValue(Hotpot.cast(field.getType(), v));
@@ -160,10 +160,9 @@ public class Craft {
 				if(craft != null) field.setValue(craft.getInstance());
 			}else { //Provider
 				var craft = crafts.get(field.getName());
-				if(craft == null) {
+				if(Objects.isNull(craft)) {
 					craft = materials.get(field.getName());
-				}
-				if(craft != null) {
+				}else {
 					var type = (Class<?>)getGnericType(entity.getKey());
 					field.setValue(new ProviderImpl<>(type, craft));
 				}
@@ -196,7 +195,7 @@ public class Craft {
 		for(int i = 0; i < len; i++) {
 			var key = Integer.valueOf(i);
 			var arg = arguments.get(key);
-			if(arg == null) return null;
+			if(Objects.isNull(arg)) return null;
 			if(!arg.completed()) return null;
 			result[i] = arg.getValue();
 		}
@@ -210,7 +209,7 @@ public class Craft {
 		var result = new Object[args.length];
 		for(int i = 0; i < args.length; i++) {
 			result[i] = args[i].getValue();
-			if(result[i] == null) return null;
+			if(Objects.isNull(result[i])) return null;
 		}
 		return result;
 	}
@@ -225,7 +224,7 @@ public class Craft {
 				instance = constructor.newInstance();
 			}else {
 				var params = toParameters();
-				if(params == null) return this; //Waiting...
+				if(Objects.isNull(params)) return this; //Waiting...
 				instance = constructor.newInstance(params);
 			}
 			//Support constructor and field injection mean time.
@@ -241,7 +240,7 @@ public class Craft {
 	 */
 	public Craft assemble() {
 		if(this.assembled) return this;
-		if(instance == null) return this; //Waiting...
+		if(Objects.isNull(instance)) return this; //Waiting...
 		this.assembled = true; //Suppose Completed
 		for(var entry : properties.entrySet()) {
 			var arg = entry.getValue();
@@ -267,10 +266,10 @@ public class Craft {
 	 * Execute injected methods.
 	 */
 	public Object execute() {
-		if(instance == null) return null; //Waiting...
+		if(Objects.isNull(instance)) return null; //Waiting...
 		for(var entry : methods.entrySet()) {
 			var params = toParameters(entry.getKey());
-			if(params == null) continue; //Waiting...
+			if(Objects.isNull(params)) continue; //Waiting...
 			try {
 				entry.getKey().invoke(instance, params);
 			}catch(Exception e) {
@@ -295,7 +294,7 @@ public class Craft {
 	}
 	
 	public boolean isDefaultConstructor() {
-		return arguments == null || arguments.isEmpty();
+		return Objects.isNull(arguments) || arguments.isEmpty();
 	}
 	
 	public Constructor<?> getConstructor() {
@@ -317,7 +316,7 @@ public class Craft {
 	public Craft withConstructor() {
 		var clazz = Hotpot.forName(type);
 		var cons = clazz.getConstructors();
-		if(cons == null || cons.length == 0) {
+		if(cons.length == 0) {
 			throw Panic.noDefaultConstructor(clazz);
 		}
 		for(var c : cons) {
@@ -337,7 +336,7 @@ public class Craft {
 			}
 		}
 		
-		if(this.constructor == null) {
+		if(Objects.isNull(this.constructor)) {
 			try { //Default and public constructor
 				this.constructor = clazz.getConstructor();
 			}catch(NoSuchMethodException | SecurityException es) {
@@ -353,13 +352,13 @@ public class Craft {
 	*/
 	private void resolveInjectedContructor(Class<?> clazz) {
 		var cons = clazz.getConstructors();
-		if(cons == null || cons.length == 0) return;
+		if(cons.length == 0) return;
 		
 		for(var c : cons) {
 			if(!Analyzer.hasInjectAnnotation(c)) continue;
 			this.constructor = c; //Cache it for new instance
 			var args = c.getParameters();
-			if(args == null || args.length == 0) break;
+			if(args.length == 0) break;
 			
 			for(int i = 0; i < args.length; i++) {
 				if(!Analyzer.isProvider(args[i])) {
@@ -375,7 +374,7 @@ public class Craft {
 			break; //Only ONE constructor can be injected
 		}
 		
-		if(this.constructor == null) {//explicitly?
+		if(Objects.isNull(this.constructor)) {//explicitly?
 			try { //Default and public constructor
 				this.constructor = clazz.getConstructor();
 			}catch(NoSuchMethodException | SecurityException es) {
@@ -385,13 +384,13 @@ public class Craft {
 	}
 	
 	private void resoveInjectedMethods(Class<?> clazz) {
-		if(clazz == null) return;
+		if(Objects.isNull(clazz)) return;
 		var ms = clazz.getDeclaredMethods();
 		if(ms != null && ms.length != 0) {
 			for(var m : ms) {
 				if(!Analyzer.hasInjectAnnotation(m)) continue;
 				var args = m.getParameters();
-				if(args == null || args.length == 0) {
+				if(args.length == 0) {
 					this.methods.put(m, new Injectee[0]);
 				}else {
 					var params = new Injectee[args.length];
@@ -412,7 +411,7 @@ public class Craft {
 	}
 	
 	private void resolveInjectedFields(Class<?> clazz) {
-		if(clazz == null) return;
+		if(Objects.isNull(clazz)) return;
 		var fs = clazz.getDeclaredFields();
 		if(fs != null && fs.length != 0) {
 			for(var f : fs) {
@@ -450,21 +449,21 @@ public class Craft {
 	}
 	
 	public void addProperty(Field field, Injectee arg) {
-		if(field == null || arg == null) return;
+		if(Hotpot.orNull(field, arg)) return;
 		arg.setType(field.getType());
 		this.properties.put(field, arg);
 		var val = arg.getValue();
-		if(val == null) return; 
+		if(Objects.isNull(val)) return; 
 		arg.resetValue(Hotpot.cast(val, field.getType()));
 	}
 	
 	public void addMethod(Method method, Injectee[] args) {
-		if(method == null || args == null) return;
+		if(Hotpot.orNull(method, args)) return;
 		this.methods.put(method, args);
 	}
 	
 	public void destroy() {
-		if(instance == null) return;
+		if(Objects.isNull(instance)) return;
 		if(instance instanceof AutoCloseable) {
 			try {
 				((AutoCloseable)instance).close();

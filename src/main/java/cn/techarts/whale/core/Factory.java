@@ -19,6 +19,7 @@ package cn.techarts.whale.core;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,7 @@ public class Factory {
 	}
 	
 	public Factory(Map<String, Craft> container, Map<String, String> configs) {
-		if(container == null) {
+		if(Objects.isNull(container)) {
 			throw Panic.nullContainer();
 		}
 		this.crafts = container;
@@ -71,14 +72,14 @@ public class Factory {
 	}
 	
 	private void resolveJSR330BasedCrafts(String... classpath) {
-		if(classpath == null || classpath.length == 0) return;
+		if(Objects.isNull(classpath)) return;
 		for(int i = 0; i < classpath.length; i++) {
 			this.scanAndResolveCrafts(classpath[i]);
 		}
 	}
 	
 	private void resolveXmlConfigBasedCrafts(String... xmlResources) {
-		if(xmlResources == null || xmlResources.length == 0) return;
+		if(Hotpot.isNull(xmlResources)) return;
 		for(int i = 0; i < xmlResources.length; i++) {
 			this.loadAndResolveXMLCrafts(xmlResources[i]);
 		}
@@ -89,7 +90,7 @@ public class Factory {
 	 */
 	public Factory load(String[] jars) {
 		if(launched) return this;
-		if(jars == null) return this;
+		if(Objects.isNull(jars)) return this;
 		if(jars.length == 0) return this;
 		for(var jar : jars) load(jar);
 		return this;
@@ -100,9 +101,9 @@ public class Factory {
 	 */
 	public Factory load(String jar) {
 		if(launched) return this;
-		if(jar == null) return this;
+		if(Hotpot.isNull(jar)) return this;
 		var classes = Scanner.scanJar(jar);
-		if(classes == null) return this;
+		if(Objects.isNull(classes)) return this;
 		if(classes.isEmpty()) return this;
 		for(var clazz : classes) {
 			this.register(clazz);
@@ -151,7 +152,7 @@ public class Factory {
 	 */
 	public Factory register(Object... beans) {
 		if(this.launched) return this;
-		if(beans == null) return this;
+		if(Objects.isNull(beans)) return this;
 		if(beans.length == 0) return this;
 		for(var bean : beans) {
 			this.register(bean);
@@ -161,7 +162,7 @@ public class Factory {
 	
 	public Factory register(List<String> classes) {
 		if(this.launched) return this;
-		if(classes == null) return this;
+		if(Objects.isNull(classes)) return this;
 		if(classes.isEmpty()) return this;
 		for(var clazz : classes) {
 			this.register(clazz);
@@ -173,7 +174,7 @@ public class Factory {
 	 */
 	public Factory register(Class<?>... beans) {
 		if(this.launched) return this;
-		if(beans == null) return this;
+		if(Objects.isNull(beans)) return this;
 		if(beans.length == 0) return this;
 		return this.register0(beans);
 	}
@@ -183,7 +184,7 @@ public class Factory {
 	 */
 	public Factory register(String... classes) {
 		if(this.launched) return this;
-		if(classes == null) return this;
+		if(Objects.isNull(classes)) return this;
 		if(classes.length == 0) return this;
 		for(var clazz : classes) {
 			this.register(clazz);
@@ -196,7 +197,7 @@ public class Factory {
 	 */
 	public Factory bind(String abstraction, String implementation) {
 		if(this.launched) return this;
-		if(abstraction == null || implementation == null) return this;
+		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation, abstraction);
 		this.appendMaterial(this.toCraft(implementation));
 		return this;
@@ -207,7 +208,7 @@ public class Factory {
 	 */
 	public Factory bind(String abstraction, Class<?> implementation) {
 		if(this.launched) return this;
-		if(abstraction == null || implementation == null) return this;
+		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation.getName(), abstraction);
 		this.appendMaterial(this.toCraft(implementation));
 		return this;
@@ -218,7 +219,7 @@ public class Factory {
 	 */
 	public Factory bind(Class<?> abstraction, Class<?> implementation) {
 		if(this.launched) return this;
-		if(abstraction == null || implementation == null) return this;
+		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation.getName(), abstraction.getName());
 		this.appendMaterial(this.toCraft(implementation));
 		return this;
@@ -246,7 +247,7 @@ public class Factory {
 	}
 	
 	private void appendMaterial(Craft craft) {
-		if(craft == null) return;
+		if(Objects.isNull(craft)) return;
 		var name = craft.getName();
 		material.put(name, craft);
 		var bind = binders.get(name);
@@ -256,22 +257,22 @@ public class Factory {
 	}
 	
 	private void register(String clzz) {
-		if(clzz == null) return;
+		if(Objects.isNull(clzz)) return;
 		var result = toCraft(clzz);
-		if(result == null) return;
+		if(Objects.isNull(result)) return;
 		this.appendMaterial(result);
 	}
 	
 	private void register(Object bean) {
-		if(bean == null) return;
+		if(Objects.isNull(bean)) return;
 		var result = toCraft(bean.getClass());
-		if(result == null) return;
+		if(Objects.isNull(result)) return;
 		result.setInstance(bean);
 		this.appendMaterial(result);
 	}
 
 	private void register(Class<?> clazz) {
-		if(clazz == null) return;
+		if(Objects.isNull(clazz)) return;
 		var result = toCraft(clazz);
 		this.appendMaterial(result);
 	}
@@ -282,7 +283,7 @@ public class Factory {
 	
 	private void ifBindAnnotaionPresents(Class<?> clazz) {
 		var bind = clazz.getAnnotation(Bind.class);
-		if(bind == null) return;
+		if(Objects.isNull(bind)) return;
 		var src = clazz.getName();
 		if(bind.value() != Bind.class) {
 			src = bind.value().getName();
@@ -308,14 +309,14 @@ public class Factory {
 	
 	/**Crafts defined in XML file.*/
 	private void loadAndResolveXMLCrafts(String resource){
-		if(resource == null|| resource.isBlank()) return;
+		if(Hotpot.isNull(resource)) return;
 		try {
 			var factory = DocumentBuilderFactory.newInstance();
 			var stream = new FileInputStream(resource);
 			var doc = factory.newDocumentBuilder().parse(stream);
 	        doc.getDocumentElement().normalize();
 	        var crafts = doc.getElementsByTagName("bean");
-	        if(crafts == null || crafts.getLength() == 0) return;
+	        if(Objects.isNull(crafts)) return;
 	        for(int i = 0; i < crafts.getLength(); i++) {
 	        	register(new XmlBean().toCraft(crafts.item(i)));
 	        }
@@ -325,9 +326,10 @@ public class Factory {
 	}
 	
 	private void scanAndResolveCrafts(String classpath) {
-		if(classpath == null || classpath.isBlank()) return;
+		if(Hotpot.isNull(classpath)) return;
 		var base = new File(classpath);//Root class-path
-		if(base == null || !base.isDirectory()) return;
+		if(Objects.isNull(base)) return;
+		if(!base.isDirectory()) return;
 		var start = base.getAbsolutePath().length();
 		var classes = Scanner.scanClasses(base, start);
 		classes.forEach(clazz->this.register(clazz));

@@ -16,6 +16,8 @@
 
 package cn.techarts.whale.core;
 
+import java.util.Objects;
+
 //import jakarta.inject.Provider;
 
 import javax.inject.Provider;
@@ -38,13 +40,13 @@ public class ProviderImpl<T> implements Provider<T> {
 	}
 	
 	public boolean verify() {
-		if(craft == null) return false;
+		if(Objects.isNull(craft)) return false;
 		return craft.isAssembled();
 	}
 	
 	@Override
 	public T get() {
-		if(craft == null) return null;
+		if(Objects.isNull(craft)) return null;
 		if(!craft.isAssembled()) return null;
 		return clazz.cast(craft.getInstance());
 	}

@@ -22,6 +22,7 @@ import javax.servlet.ServletContextListener;
 
 import cn.techarts.whale.Context;
 import cn.techarts.whale.Panic;
+import cn.techarts.whale.util.Hotpot;
 
 /**
  * The class allows developer to integrate the whale in a web project.
@@ -44,7 +45,7 @@ public class WebListener implements ServletContextListener {
 	
 	private String getRootClassPath() {
 		var result = getClass().getResource("/");
-		if(result == null || result.getPath() == null) {
+		if(Hotpot.orNull(result, result.getPath())) {
 			throw new Panic("Failed to find the root class path.");
 		}
 		return result.getPath();

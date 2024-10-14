@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 import cn.techarts.whale.Panic;
@@ -37,7 +38,7 @@ import cn.techarts.whale.Panic;
 public final class Hotpot {
 	
 	public static Object cast(Object v, Type t) {
-		if(t == null) return v;
+		if(Objects.isNull(t)) return v;
 		if(!(v instanceof String)) {
 			return v;
 		}
@@ -133,7 +134,7 @@ public final class Hotpot {
 	 * @return Returns true if the parameter equals "1" or "true"
 	 */
 	public static boolean toBoolean(String arg) {
-		if(arg == null) return false;
+		if(Objects.isNull(arg)) return false;
 		var val = arg.trim().toLowerCase();
 		return val.equals("1") || val.equals("true");
 	}
@@ -168,7 +169,7 @@ public final class Hotpot {
 	}
 	
 	private static boolean isGetter(String name) {
-		if(name == null) return false;
+		if(Objects.isNull(name)) return false;
 		if(name.startsWith("is")) return true;
 		return name.startsWith("get");
 	}
@@ -185,11 +186,11 @@ public final class Hotpot {
 	 * Map to Bean
 	 */
 	public static void fill(Object target, Map<String, Object> data) {
-		if(target == null || data == null) return;
+		if(orNull(target, data)) return;
 		try {
 			var clazz = target.getClass();
 			var methods = clazz.getMethods();
-			if(methods == null) return;
+			if(Objects.isNull(methods)) return;
 			for(var m : methods) {
 				var name = m.getName();
 				if(!name.startsWith("set")) continue;
@@ -206,11 +207,11 @@ public final class Hotpot {
 	 * Bean to Map
 	 */
 	public static Map<String, Object> dump(Object target) {
-		if(target == null) return Map.of();
+		if(Objects.isNull(target)) return Map.of();
 		try {
 			var clazz = target.getClass();
 			var methods = clazz.getMethods();
-			if(methods == null || methods.length == 0) return Map.of();
+			if(isNull(methods)) return Map.of();
 			var getters = new ArrayList<String>();
 			for(var method : methods) {
 				var name = method.getName();
@@ -259,8 +260,7 @@ public final class Hotpot {
 	}	
 	
 	public static String getFirst(String[] statements) {
-		if(statements == null) return null;
-		if(statements.length == 0) return null;
+		if(isNull(statements)) return null;
 		return statements[0]; //Note: maybe null here
 	}
 	
@@ -284,11 +284,11 @@ public final class Hotpot {
 				}
 				if(!multiLines && line.matches(P)) sentence = line;
 				multiLines = line.endsWith("\\\\"); //Current Line
-				if(sentence == null || multiLines) continue;
+				if(Objects.isNull(sentence) || multiLines) continue;
 				int i = sentence.indexOf('=');
 				var k = sentence.substring(0, i);
 				var v = sentence.substring(i + 1);
-				if(v == null || v.length() == 0) continue;
+				if(isNull(v)) continue;
 				result.put(k.trim(), v.trim());
 				sentence = null; //Reset the variable 
 			}
@@ -296,5 +296,21 @@ public final class Hotpot {
 		}catch(IOException e){
 			throw new RuntimeException("Fail to load the ini file", e);
 		}
+	}
+	
+	public static boolean orNull(Object arg0, Object arg1) {
+		return arg0 == null || arg1 == null;
+	}
+	
+	public static boolean isNull(String arg) {
+		return arg == null || arg.isBlank();
+	}
+	
+	public static boolean isNull(Object[] arg) {
+		return arg == null || arg.length == 0;
+	}
+	
+	public static boolean isNull(Map<?, ?> arg) {
+		return arg == null || arg.isEmpty();
 	}
 }

@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,10 +53,10 @@ public class XmlBean {
 	}
 	
 	private void parseArgs(NodeList nodes, Craft result) {
-		if(nodes == null || nodes.getLength() != 1) return;
+		if(this.notOnly(nodes)) return;
 		var first = (org.w3c.dom.Element)nodes.item(0);
 		var args = first.getElementsByTagName("arg");
-		if(args == null || args.getLength() == 0) return;
+		if(this.isNull(args)) return;
 		for(int i = 0; i < args.getLength(); i++) {
 			var arg = args.item(i);
 			if(arg.getNodeType() != Node.ELEMENT_NODE) continue;
@@ -65,10 +66,10 @@ public class XmlBean {
 	}
 	
 	private void parseProps(NodeList nodes, Craft result) {
-		if(nodes == null || nodes.getLength() != 1) return;
+		if(this.notOnly(nodes)) return;
 		var first = (org.w3c.dom.Element)nodes.item(0);
 		var props = first.getElementsByTagName("prop");
-		if(props == null || props.getLength() == 0) return;
+		if(this.isNull(props)) return;
 		var fields = new HashMap<String, Field>();
 		getFields(fields, Hotpot.forName(result.getType()));
 		for(int i = 0; i < props.getLength(); i++) {
@@ -82,10 +83,10 @@ public class XmlBean {
 	}
 	
 	private void parseMethods(NodeList nodes, Craft result) {
-		if(nodes == null || nodes.getLength() != 1) return;
+		if(this.notOnly(nodes)) return;
 		var first = (org.w3c.dom.Element)nodes.item(0);
 		var methods = first.getElementsByTagName("method");
-		if(methods == null || methods.getLength() == 0) return;
+		if(this.isNull(methods)) return;
 		var funs = new HashMap<String, Method>();
 		getMethods(funs, Hotpot.forName(result.getType()));
 		for(int i = 0; i < methods.getLength(); i++) {
@@ -108,7 +109,7 @@ public class XmlBean {
 	
 	private Injectee[] xmlNode2Injectees(Element node) {
 		var args = node.getElementsByTagName("arg");
-		if(args == null || args.getLength() == 0) return null;
+		if(this.isNull(args)) return null;
 		var result = new Injectee[args.getLength()];
 		for(int i = 0; i < args.getLength(); i++) {
 			var arg = args.item(i);
@@ -119,7 +120,7 @@ public class XmlBean {
 	}
 	
 	private void getFields(Map<String, Field> result, Class<?> clazz) {
-		if(clazz == null) return; //Without super class
+		if(Objects.isNull(clazz)) return; //Without super class
 		var fs = clazz.getDeclaredFields();
 		if(fs != null && fs.length != 0) {
 			for(var f : fs) {
@@ -130,7 +131,7 @@ public class XmlBean {
 	}	
 	
 	private void getMethods(Map<String, Method> result, Class<?> clazz) {
-		if(clazz == null) return; //Without super class
+		if(Objects.isNull(clazz)) return; //Without super class
 		var ms = clazz.getDeclaredMethods();
 		if(ms != null && ms.length != 0) {
 			for(var m : ms) {
@@ -138,5 +139,13 @@ public class XmlBean {
 			}
 		}
 		getMethods(result, clazz.getSuperclass());
-	}	
+	}
+	
+	private boolean isNull(NodeList arg) {
+		return arg == null || arg.getLength() == 0;
+	}
+	
+	private boolean notOnly(NodeList arg) {
+		return arg == null || arg.getLength() != 1;
+	}
 }

@@ -20,6 +20,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.util.Objects;
+
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -122,7 +124,7 @@ public class Injectee {
 	
 	public void setValue(Object value) {
 		//To avoid duplicated setting 
-		if(this.value == null) {
+		if(Objects.isNull(this.value)) {
 			this.value = value;
 		}
 	}
@@ -140,7 +142,7 @@ public class Injectee {
 	}
 	
 	public String getTypeName() {
-		if(type == null) return null;
+		if(Objects.isNull(type)) return null;
 		return this.type.getTypeName();
 	}
 	
