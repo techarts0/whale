@@ -41,7 +41,7 @@ public class Craft {
 	private Object instance;
 	private boolean singleton;
 	private boolean assembled;
-	private Method initializer;
+	private Method onReady;
 		
 	/** Injected or default constructor*/
 	private Constructor<?> constructor;
@@ -396,7 +396,7 @@ public class Craft {
 		if(ms != null && ms.length != 0) {
 			for(var m : ms) {
 				if(Analyzer.isInitializer(m)) {
-					initializer = m; 
+					onReady = m; 
 					continue;
 				}				
 				if(!Analyzer.hasInjectAnnotation(m)) continue;
@@ -475,10 +475,10 @@ public class Craft {
 	
 	public void init() {
 		if(!assembled) return;
+		if(onReady == null) return;
 		if(instance == null) return;
-		if(initializer == null) return;
 		try {
-			initializer.invoke(instance);
+			onReady.invoke(instance);
 		}catch(Exception e) {
 			throw Panic.failed2Init(name, e);
 		}
