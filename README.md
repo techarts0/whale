@@ -27,6 +27,7 @@ JSR330's appeal lies in its simplicity, consisting of just 4 annotations and one
 | 5    | Bind       | Relates an interface or abstraction to a specific implementation. (Non JSR330) |
 | 6    | Qualifier  | Meta annotation.                                             |
 | 7    | Provider   | An interface, not an annotation, used for resolving circular dependencies or lazy loading. |
+| 8    | Ready      | An annotation to mark the method is an initializer of the object. It will be call ONCE after creating. |
 
 Whale supports three dependence types:
 
