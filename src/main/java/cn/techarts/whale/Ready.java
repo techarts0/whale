@@ -23,7 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Execute the method to initialize the managed-object.
+ * Execute the method to initialize the managed-object.<br>
+ * IMPORTANT: A managed-object has only one initializer.
  * 
  * @author rocwon@gmail.com
  */
