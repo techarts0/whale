@@ -105,6 +105,10 @@ public class Panic extends RuntimeException {
 		return new Panic("Failed to close the managed object: " + craft, e);
 	}
 	
+	public static Panic failed2Init(String craft, Throwable e) {
+		return new Panic("Failed to initialize the managed object: " + craft, e);
+	}
+	
 	public static Panic failed2ParseXml(String file, Throwable e) {
 		return new Panic("Failed to parse the xml config: " + file, e);
 	}

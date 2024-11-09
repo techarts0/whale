@@ -41,6 +41,7 @@ public class Craft {
 	private Object instance;
 	private boolean singleton;
 	private boolean assembled;
+	private Method initializer;
 		
 	/** Injected or default constructor*/
 	private Constructor<?> constructor;
@@ -188,6 +189,11 @@ public class Craft {
 		}
 	}
 	
+	public<T> T getInstance(Class<T> t){
+		var result = getInstance();
+		return t.cast(result);
+	}
+	
 	//Constructor Parameters
 	private Object[] toParameters() {
 		var len = arguments.size();
@@ -277,6 +283,7 @@ public class Craft {
 				throw Panic.cannotInvoke(name + "." + mn, e);
 			}
 		}
+		this.init(); //If it has an initializer
 		return this.instance; //Constructed, assembled, executed.
 	}
 	
@@ -388,6 +395,10 @@ public class Craft {
 		var ms = clazz.getDeclaredMethods();
 		if(ms != null && ms.length != 0) {
 			for(var m : ms) {
+				if(Analyzer.isInitializer(m)) {
+					initializer = m; 
+					continue;
+				}				
 				if(!Analyzer.hasInjectAnnotation(m)) continue;
 				var args = m.getParameters();
 				if(args.length == 0) {
@@ -462,6 +473,17 @@ public class Craft {
 		this.methods.put(method, args);
 	}
 	
+	public void init() {
+		if(!assembled) return;
+		if(instance == null) return;
+		if(initializer == null) return;
+		try {
+			initializer.invoke(instance);
+		}catch(Exception e) {
+			throw Panic.failed2Init(name, e);
+		}
+	}
+	
 	public void destroy() {
 		if(Objects.isNull(instance)) return;
 		if(instance instanceof AutoCloseable) {
@@ -472,5 +494,5 @@ public class Craft {
 				throw Panic.failed2Close(name, e);
 			}
 		}
-	}
+	}	
 }

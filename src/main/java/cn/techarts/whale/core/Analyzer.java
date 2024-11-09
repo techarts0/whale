@@ -29,6 +29,8 @@ import javax.inject.Provider;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
+import cn.techarts.whale.Ready;
+
 //import jakarta.inject.Named;
 //import jakarta.inject.Inject;
 //import jakarta.inject.Provider;
@@ -142,5 +144,10 @@ public class Analyzer {
 	
 	public static boolean hasInjectAnnotation(Method m) {
 		return m.isAnnotationPresent(Inject.class);
+	}
+	
+	public static boolean isInitializer(Method m) {
+		var had = m.isAnnotationPresent(Ready.class);
+		return had ? m.getParameterCount() == 0 : false;
 	}
 }
