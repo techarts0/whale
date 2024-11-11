@@ -35,8 +35,7 @@ import cn.techarts.whale.util.Hotpot;
  */
 public class XmlBean {
 	
-	
-	//TODO XML DOES NOT SUPPORT PROVIDER AND BIND
+	//TODO XML DOES NOT SUPPORT PROVIDER, BIND AND READY
 	public XmlBean() {
 	}
 	

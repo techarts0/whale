@@ -34,12 +34,9 @@ import cn.techarts.whale.util.Hotpot;
  */
 public class Injectee {
 	private int __t;
-	//Null means REF
 	private Type type;
-	//Null means VAL
 	private String name;
 	private Object value;
-	//Is it a Provider<T>?
 	private boolean assembled;
 	
 	public static final int NON = 0, REF = 1, KEY = 2, VAL = 3, PROVIDER = 4;
@@ -123,7 +120,6 @@ public class Injectee {
 	}
 	
 	public void setValue(Object value) {
-		//To avoid duplicated setting 
 		if(Objects.isNull(this.value)) {
 			this.value = value;
 		}

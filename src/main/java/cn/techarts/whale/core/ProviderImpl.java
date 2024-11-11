@@ -48,6 +48,6 @@ public class ProviderImpl<T> implements Provider<T> {
 	public T get() {
 		if(Objects.isNull(craft)) return null;
 		if(!craft.isAssembled()) return null;
-		return clazz.cast(craft.getInstance());
+		return this.craft.getInstance(clazz);
 	}
 }

@@ -16,6 +16,8 @@
 
 package cn.techarts.whale.web;
 
+import java.util.logging.Logger;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,7 +32,9 @@ import cn.techarts.whale.util.Hotpot;
  * @author rocwon@gmail.com
  */
 public class WebListener implements ServletContextListener {
-		
+	
+	private static final Logger LOGGER = Hotpot.getLogger();
+	
 	@Override
 	public void contextInitialized(ServletContextEvent arg) {
 		var context = arg.getServletContext();
@@ -56,7 +60,8 @@ public class WebListener implements ServletContextListener {
 		if(result != null && result.getPath() != null) return result.getPath();
 		result = getClass().getResource("/WEB-INF/".concat(resource));
 		if(result != null && result.getPath() != null) return result.getPath();
-		throw new Panic("Failed to find the resource: [" + resource + "]");
+		LOGGER.warning("Failed to find the resource: [" + resource + "]");
+		return null; //Don't throw an exception to avoid application crashed.
 	}
 	
 	@Override

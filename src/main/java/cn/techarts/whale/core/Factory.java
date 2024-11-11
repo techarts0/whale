@@ -328,7 +328,6 @@ public class Factory {
 	private void scanAndResolveCrafts(String classpath) {
 		if(Hotpot.isNull(classpath)) return;
 		var base = new File(classpath);//Root class-path
-		if(Objects.isNull(base)) return;
 		if(!base.isDirectory()) return;
 		var start = base.getAbsolutePath().length();
 		var classes = Scanner.scanClasses(base, start);

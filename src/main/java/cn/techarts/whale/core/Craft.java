@@ -38,10 +38,10 @@ import cn.techarts.whale.util.Hotpot;
 public class Craft {
 	private String name;
 	private String type;
+	private Method onReady;
 	private Object instance;
 	private boolean singleton;
 	private boolean assembled;
-	private Method onReady;
 		
 	/** Injected or default constructor*/
 	private Constructor<?> constructor;
@@ -78,16 +78,6 @@ public class Craft {
 		this.resoveInjectedMethods(clazz);
 		this.resolveInjectedContructor(clazz);
 	}
-	
-//	public boolean isManaged() {
-//		if(!arguments.isEmpty()) {
-//			return true;
-//		}
-//		if(!properties.isEmpty()) {
-//			return true;
-//		}
-//		return !methods.isEmpty();
-//	}
 	
 	/**
 	 * Set dependent crafts (REF, KEY, VAL, PROVIDER) before assembling.
