@@ -470,6 +470,19 @@ public class Family{
 
 Whale will seamlessly inject the correct implementation into the `cat` and `dog` properties, eliminating the need for verbose configuration. While the Bind annotation associates an implementation with an interface, it's not well-suited for scenarios with multiple implementations. Custom Qualifiers provide a more effective way to specify and inject different implementations, offering a more elegant solution.
 
+### D. Initializer and Finalizer
+If you mark a method with the annotation @Ready, the method will be invoked after finishing assemble. The initializer is executed later than the constructor because it MUST wait all injections are finished (especially methods injection). 
+
+```java
+@Ready
+public void init(){
+    //do something here    
+}
+
+```
+Whale does not provide the finalizer annotation. You should implement the AutoClosable interface. When the DI container is shutdown, the close method will be called automatically.
+
+
 ## 6. Web Application
 
 The WebListener class enables the intergation of whale into a web application. Please add a listener declaration(using the listener tag) in web.xml file:
