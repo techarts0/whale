@@ -480,7 +480,7 @@ public void init(){
 }
 
 ```
-Whale does not provide the finalizer annotation. You should implement the AutoClosable interface. When the DI container is shutdown, the close method will be called automatically.
+Whale does not provide the finalizer annotation. You should implement the AutoCloseable interface. When the DI container is shutdown, the close method will be called automatically.
 
 
 ## 6. Web Application
