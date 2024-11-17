@@ -356,7 +356,7 @@ The first approach ontlined above is overly verbose, and the second approach dev
 ```java
 package whale.demo.service;
 
-@Bind(target=DemoService.class)
+@Bind(target=DemoServiceImpl.class)
 public interface DemoService{
 	public Object doSomething(Object args);
 }
