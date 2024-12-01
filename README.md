@@ -356,7 +356,7 @@ The first approach ontlined above is overly verbose, and the second approach dev
 ```java
 package whale.demo.service;
 
-@Bind(target=DemoService.class)
+@Bind(target=DemoServiceImpl.class)
 public interface DemoService{
 	public Object doSomething(Object args);
 }
@@ -469,6 +469,19 @@ public class Family{
 ```
 
 Whale will seamlessly inject the correct implementation into the `cat` and `dog` properties, eliminating the need for verbose configuration. While the Bind annotation associates an implementation with an interface, it's not well-suited for scenarios with multiple implementations. Custom Qualifiers provide a more effective way to specify and inject different implementations, offering a more elegant solution.
+
+### D. Initializer and Finalizer
+If you mark a method with the annotation @Ready, the method will be invoked after finishing assemble. The initializer is executed later than the constructor because it MUST wait all injections are finished (especially methods injection). 
+
+```java
+@Ready
+public void init(){
+    //do something here    
+}
+
+```
+Whale does not provide the finalizer annotation. You should implement the AutoCloseable interface. When the DI container is shutdown, the close method will be called automatically.
+
 
 ## 6. Web Application
 
