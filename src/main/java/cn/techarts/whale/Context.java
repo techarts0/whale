@@ -28,7 +28,7 @@ import cn.techarts.whale.core.Factory;
 import cn.techarts.whale.util.Hotpot;
 
 /**
- * It represents the IOC container. <p>
+ * the DI container. <p>
  *
  * @author rocwon@gmail.com
  */
@@ -208,7 +208,7 @@ public class Context implements AutoCloseable{
 		this.cleanup();
 		this.crafts = null;
 		this.configs = null;
-		LOGGER.info("The whale context has been cleaned up.");
+		LOGGER.info("The whale context has been destroyed.");
 	}
 	
 	private void cleanup() {

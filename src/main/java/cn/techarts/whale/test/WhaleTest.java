@@ -6,7 +6,7 @@ import cn.techarts.whale.Context;
 import junit.framework.TestCase;
 
 public class WhaleTest {
-	private static final String CLASSPATH = "/D:/Studio/Project/Java/whale/target/classes"; //Your class path
+	private static final String CLASSPATH = "/D:/Project/java/whale/target/classes"; //Your class path
 	private static final Map<String, String> CFG = Map.of("zone", "+86", "user.id", "45", 
 			"build.name", "Library", "user.name", "Johnson", "party.name", "Republic");
 	
@@ -77,7 +77,7 @@ public class WhaleTest {
 	public void testParseXML() {
 		var ctx = Context.make(CFG);
 		var factory = ctx.createFactory();
-		factory.parse("D:\\Studio\\Project\\Java\\whale\\src\\main\\java\\cn\\techarts\\whale\\test\\beans.xml");
+		factory.parse("D:\\Project\\java\\whale\\src\\main\\java\\cn\\techarts\\whale\\test\\beans.xml");
 		factory.start();
 		
 		
@@ -86,7 +86,7 @@ public class WhaleTest {
 		
 		ctx.close();
 		TestCase.assertEquals(333, t.getId());
-		TestCase.assertEquals(1000, t.getMemebers());
+		TestCase.assertEquals(1000, t.getMembers());
 		TestCase.assertEquals("Republic", t.getName());
 		TestCase.assertEquals("Trump", t.getChairman().getName());
 	

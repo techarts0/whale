@@ -61,7 +61,7 @@ public class WebListener implements ServletContextListener {
 		result = getClass().getResource("/WEB-INF/".concat(resource));
 		if(result != null && result.getPath() != null) return result.getPath();
 		LOGGER.warning("Failed to find the resource: [" + resource + "]");
-		return null; //Don't throw an exception to avoid application crashed.
+		return null; //Don't throw an exception to avoid application crash.
 	}
 	
 	@Override

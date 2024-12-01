@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 public class Party {
 	private int id;
 	private String name;
-	private int memebers;
+	private int members;
 	private Chairman chairman;
 	
 	public Party() {}
@@ -24,12 +24,12 @@ public class Party {
 		this.chairman = chairman;
 	}
 
-	public int getMemebers() {
-		return memebers;
+	public int getMembers() {
+		return members;
 	}
 
-	public void setMemebers(int memebers) {
-		this.memebers = memebers;
+	public void setMembers(int memebers) {
+		this.members = memebers;
 	}
 
 	public String getName() {
