@@ -86,6 +86,15 @@ public class Context implements AutoCloseable{
 	}
 	
 	/**
+	 * We strongly recommand you using {@link getBinder} and {@link getLoader} instead.
+	 */
+	@Deprecated
+	public Factory createFactory() {
+		if(craftFactory.launched()) return null;
+		return this.craftFactory;
+	}
+	
+	/**
 	 * Retrieve the context from SERVLET context.(Web Application)
 	 */
 	public static Context from(ServletContext context) {
