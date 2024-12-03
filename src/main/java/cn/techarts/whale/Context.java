@@ -90,7 +90,9 @@ public class Context implements AutoCloseable{
 	 */
 	@Deprecated
 	public Factory createFactory() {
-		if(craftFactory.launched()) return null;
+		if(craftFactory.launched()) {
+			return null;
+		}
 		return this.craftFactory;
 	}
 	
