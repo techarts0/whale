@@ -128,17 +128,17 @@ public class WhaleTest{
         //Or read configuration from a properties file
         //var context = Context.make("/tmp/project/demo/config.properties");
         
-        var factory = context.createFactory();
-        factory.scan("/tmp/project/demo/bin");
+        var loader = context.getLoader();
+        loader.scan("/tmp/project/demo/bin");
         
         //If you have more than one classpath:
-        //factory.scan("Another classpath");
-        //factory.scan("classpath-1", "class-path2");
+        //loader.scan("Another classpath");
+        //loader.scan("classpath-1", "class-path2");
         
-        factory.start();
+        context.start();
         
         //The chain-stype calling is supported:
-        //context.createFactory().scan("/tmp/project/demo/bin").start();
+        //context.getLoader().scan("/tmp/project/demo/bin").start();
         
         var person = context.get(Person.class);
         var mobile = context.get(Mobile.class);
@@ -156,13 +156,13 @@ public class WhaleTest{
     @Test
     public void testRegisterManually(){
         var context = Context.make(CONFIGS);
-        var factory = context.createFactory();
-        factory.register(Person.class);
-        factory.register(Mobile.class);
-        factory.start();
+        var binder = context.getBinder();
+        binder.register(Person.class);
+        binder.register(Mobile.class);
+        context.start();
         
         //Chain-style calling:
-        //factory.register(Person.class, Mobile.class).start();
+        //binder.register(Person.class, Mobile.class).start();
         
         var person = context.get(Person.class);
         var mobile = context.get(Mobile.class);
@@ -178,11 +178,11 @@ We assume to packed these 2 classes into a JAR file "/tmp/project/demo/lib/demo.
     @Test
     public void testLoadFromJAR(){
     	var context = Context.make(CONFIGS);
-    	var factory = context.createFactory();
-    	factory.load("/tmp/project/demo/lib/demo.jar");
-    	factory.start();
+    	var loader = context.getLoader();
+    	loader.load("/tmp/project/demo/lib/demo.jar");
+    	context.start();
        
-   		var person = context.get(Person.class);
+   	var person = context.get(Person.class);
     	var mobile = context.get(Mobile.class);
     	TestCase.assertEquals(18, person.getAge());
      	TestCase.assertEquals("John Denver", person.getName());
@@ -235,9 +235,9 @@ More advanced features are forbidden because it makes the XML schema very ugly.
     @Test
     public void testParseXMLDefinition(){
     	var context = Context.make(CONFIGS);
-     	var factory = context.createFactory();
-      	factory.parse("/tmp/project/demo/beans.xml");
-      	factory.start();
+     	var loader = context.getLoader();
+      	loader.parse("/tmp/project/demo/beans.xml");
+      	context.start();
        	
        	//Chain-stype calling
        	//context.createFactory().parse("/tmp/project/demo/beans.xml").start();
@@ -253,7 +253,7 @@ More advanced features are forbidden because it makes the XML schema very ugly.
 ```
 You can actually pass multiple XML definitions to the method parse. For example:
 ```java
-    factory.parse("/tmp/project/demo/beans-1.xml", "/tmp/project/demo/beans-2.xml");
+    loader.parse("/tmp/project/demo/beans-1.xml", "/tmp/project/demo/beans-2.xml");
 ```
 
 ## 4. Provider<T>
@@ -381,7 +381,7 @@ public class Demo{
 Certainly, you can call the bind method manually in code:
 
 ```java
-factory.bind(DemoService.class, DemoServiceImpl.class);
+binder.bind(DemoService.class, DemoServiceImpl.class);
 ```
 
 To summarize, the Bind annotation provides a straightforward way for mapping an abstraction (interface or abstract class) to its concrete implementation, simplifying the dependence configuration.
@@ -394,12 +394,12 @@ Whale offers the flexibility to append managed objects into DI container even af
  @Test
     public void testAppendBeans(){
         var context = Context.make(CONFIGS);
-        var factory = context.createFactory();
-        factory.register(Person.class);
-        factory.register(Mobile.class);
-        factory.start(); //Container Initialized
+        var binder = context.getBinder();
+        binder.register(Person.class);
+        binder.register(Mobile.class);
+        context.start(); //Container Initialized
         
-      	factory.append(DemoServiceImpl.class);
+      	binder.append(DemoServiceImpl.class);
         
         var person = context.get(Person.class);
         var mobile = context.get(Mobile.class);
@@ -482,6 +482,20 @@ public void init(){
 ```
 Whale does not provide the finalizer annotation. You should implement the AutoCloseable interface. When the DI container is shutdown, the close method will be called automatically.
 
+### E. Import external singleton object(Non-JSR330) as a managed bean into container:
+
+```java
+public void testIncludeObject(){
+    var context = Context.make();
+    var binder = context.getBinder();
+    binder.include(new Object());
+    binder.include(new Object(), "myObject");
+    context.start();
+    TestCase.assertEequals(true, context.get("myObject") != null);
+    TestCase.assertEquaqls(true, context.get(Object.class) != null);
+    TestCase.assertEquals(false, context.get("myObject") == context.get(Object.class));
+}
+```
 
 ## 6. Web Application
 
@@ -506,5 +520,6 @@ public DemoServlet extends HttpServlet{
 ## 7. Todo List
 We plan to add the following features:
 - Interceptor and Enhancer annotations.
+- Support namespace or module
 - Refactor code to improve performance.
 - Fix bugs as soon as they are found.
