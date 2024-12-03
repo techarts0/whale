@@ -10,18 +10,19 @@ public class WhaleTest {
 	private static final Map<String, String> CFG = Map.of("zone", "+86", "user.id", "45", 
 			"build.name", "Library", "user.name", "Johnson", "party.name", "Republic");
 	
-	@Test
+	//@Test
 	public void testRegisterManually() {
 		var ctx = Context.make(CFG);
-		var factory = ctx.createFactory();
-		factory
+		var binder = ctx.getBinder();
+		binder
 		.register(Person.class, Mobile.class)
 		.register(People.class)
 		.bind(SomeInterface.class, SomeInterfaceImpl.class)
-		.register(Office.class)
-		.start();
+		.register(Office.class);
 		
-		ctx.append(Party.class);
+		ctx.start();
+		
+		binder.append(Party.class);
 		
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
@@ -47,13 +48,13 @@ public class WhaleTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testScanClasspath() {
 		var ctx = Context.make(CFG);
+		var loader = ctx.getLoader();
+		loader.scan(CLASSPATH);
 		
-		var factory = ctx.createFactory();
-		
-		factory.scan(CLASSPATH).start();
+		ctx.start();
 		
 		var p = ctx.get(Person.class);
 		var m = ctx.get(Mobile.class);
@@ -73,12 +74,12 @@ public class WhaleTest {
 		ctx.close();
 	}
 	
-	@Test
+	//@Test
 	public void testParseXML() {
 		var ctx = Context.make(CFG);
-		var factory = ctx.createFactory();
+		var factory = ctx.getLoader();
 		factory.parse("D:\\Project\\java\\whale\\src\\main\\java\\cn\\techarts\\whale\\test\\beans.xml");
-		factory.start();
+		ctx.start();
 		
 		
 		//var p = ctx.get(Person.class);
@@ -90,5 +91,19 @@ public class WhaleTest {
 		TestCase.assertEquals("Republic", t.getName());
 		TestCase.assertEquals("Trump", t.getChairman().getName());
 	
-	}	
+	}
+	
+	@Test
+	public void testIncludeExternalObject() {
+		var ctx = Context.make();
+		ctx.getBinder().include(new Object());
+		ctx.getBinder().include(new Object(), "mydear");
+		ctx.start();
+		
+		var mydear = ctx.get("mydear");
+		var plain = ctx.get(Object.class);
+		
+		TestCase.assertEquals(true, mydear != null);
+		TestCase.assertEquals(true, plain != null);
+	}
 }

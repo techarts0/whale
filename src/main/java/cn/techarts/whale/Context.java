@@ -23,8 +23,10 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
+import cn.techarts.whale.core.Binder;
 import cn.techarts.whale.core.Craft;
 import cn.techarts.whale.core.Factory;
+import cn.techarts.whale.core.Loader;
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -35,13 +37,14 @@ import cn.techarts.whale.util.Hotpot;
 public class Context implements AutoCloseable{
 	private Map<String, Craft> crafts;
 	private Map<String, String> configs;
-	private boolean factoryCreated = false;
-	public static final String NAME = "context.whale.techarts";
+	private Factory craftFactory = null;
 	private static final Logger LOGGER = Hotpot.getLogger();
+	public static final String NAME = "context.whale.techarts";
 	
 	private Context(Map<String, Craft> container, Map<String, String> configs){
+		this.crafts = container;
 		this.configs = Objects.isNull(configs) ? Map.of() : configs;
-		this.crafts = Objects.isNull(container) ? Map.of() : container;
+		this.craftFactory = new Factory(this.crafts, this.configs);
 	}
 	
 	/**
@@ -68,26 +71,18 @@ public class Context implements AutoCloseable{
 		return new Context(new HashMap<>(256), configs);
 	}
 	
-	/**
-	 * Create a bean factory to register/bind beans manually.<p>
-	 * If the factory has been created, null will be returned.
-	 */
-	public Factory createFactory() {
-		if(factoryCreated) return null;
-		this.factoryCreated = true; //ONCE
-		return new Factory(crafts, configs);
+	public Binder getBinder() {
+		if(craftFactory.launched()) {
+			return null;
+		}
+		return (Binder)this.craftFactory;
 	}
 	
-	/**
-	 * Clean up all managed objects and restore the initial state.
-	 * you should call {@link createFactory} to rebuild these beans.
-	 */
-	public Context reset() {
-		if(factoryCreated) {
-			this.cleanup();
-			factoryCreated = false;
+	public Loader getLoader() {
+		if(craftFactory.launched()) {
+			return null;
 		}
-		return this;
+		return (Loader)this.craftFactory;
 	}
 	
 	/**
@@ -99,15 +94,6 @@ public class Context implements AutoCloseable{
 		if(Objects.isNull(obj)) return null;
 		if(!(obj instanceof Context)) return null;
 		return (Context)obj;
-	}
-	
-	/**
-	 * Append managed objects after context initialized.
-	 */
-	public void append(Class<?>... classes) {
-		if(factoryCreated == false) return;
-		if(Hotpot.isNull(classes)) return;
-		new Factory(this.crafts, this.configs).append(classes);
 	}
 	
 	/**
@@ -174,7 +160,7 @@ public class Context implements AutoCloseable{
 		return get(clazz.getName(), clazz);
 	}
 	
-	public Map<String, Object> all1(){
+	public Map<String, Object> all(){
 		if(Objects.isNull(crafts)) return Map.of();
 		if(this.crafts.isEmpty()) return Map.of();
 		var result = new HashMap<String, Object>();
@@ -203,11 +189,18 @@ public class Context implements AutoCloseable{
 		return this;
 	}
 	
+	public void start() {
+		if(!craftFactory.launched()) {
+			this.craftFactory.launch();
+		}
+	}
+	
 	@Override
 	public void close() {
 		this.cleanup();
 		this.crafts = null;
 		this.configs = null;
+		this.craftFactory = null;
 		LOGGER.info("The whale context has been destroyed.");
 	}
 	
@@ -218,5 +211,4 @@ public class Context implements AutoCloseable{
 		}
 		this.crafts.clear();
 	}
-	
 }

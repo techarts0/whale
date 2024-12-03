@@ -39,12 +39,12 @@ public class WebListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg) {
 		var context = arg.getServletContext();
 		var config = getResourcePath("config.properties");
-		Context.make(config)
-			   .cache(context)
-			   .createFactory()
-			   .scan(getRootClassPath())
-			   .parse(getResourcePath("beans.xml"))
-			   .start();
+		var ctx = Context.make(config).cache(context);
+		var loader = ctx.getLoader();
+		loader.scan(getRootClassPath())
+			  .parse(getResourcePath("beans.xml"));
+		
+		ctx.start();
 	}
 	
 	private String getRootClassPath() {

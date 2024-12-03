@@ -38,7 +38,7 @@ import cn.techarts.whale.util.Scanner;
  * 
  * @author rocwon@gmail.com
  */
-public class Factory {
+public class Factory implements Binder, Loader{
 	private boolean launched = false;
 	private Map<String, Craft> crafts;
 	private Map<String, Craft> material;
@@ -64,7 +64,7 @@ public class Factory {
 	/**
 	 * <b>IMPORTANT: The method can only be called ONCE!</b>
 	 */
-	public void start() {
+	public void launch() {
 		if(this.launched) return;
 		this.assembleAndInstanceCrafts();
 		this.launched = true; //The method can only be called ONCE.
@@ -88,7 +88,8 @@ public class Factory {
 	/**
 	 * Load and register managed beans from multiple JAR files.
 	 */
-	public Factory load(String[] jars) {
+	@Override
+	public Loader load(String[] jars) {
 		if(launched) return this;
 		if(Objects.isNull(jars)) return this;
 		if(jars.length == 0) return this;
@@ -99,7 +100,8 @@ public class Factory {
 	/**
 	 * Load and register managed beans from a JAR file.
 	 */
-	public Factory load(String jar) {
+	@Override
+	public Loader load(String jar) {
 		if(launched) return this;
 		if(Hotpot.isNull(jar)) return this;
 		var classes = Scanner.scanJar(jar);
@@ -114,7 +116,8 @@ public class Factory {
 	/**
 	 * Scan the specified multiple class-paths to register managed objects.
 	 */
-	public Factory scan(String[] classpaths) {
+	@Override
+	public Loader scan(String[] classpaths) {
 		if(this.launched) return this;
 		resolveJSR330BasedCrafts(classpaths);
 		return this;
@@ -123,7 +126,8 @@ public class Factory {
 	/**
 	 * Scan the specified single class-path to register managed objects.
 	 */
-	public Factory scan(String classpath) {
+	@Override
+	public Loader scan(String classpath) {
 		if(this.launched) return this;
 		resolveJSR330BasedCrafts(classpath);
 		return this;
@@ -132,7 +136,8 @@ public class Factory {
 	/**
 	 * Parse the specified multiple XML files to register managed objects.
 	 */
-	public Factory parse(String[] xmlResources) {
+	@Override
+	public Loader parse(String[] xmlResources) {
 		if(this.launched) return this;
 		resolveXmlConfigBasedCrafts(xmlResources);
 		return this;
@@ -141,16 +146,18 @@ public class Factory {
 	/**
 	 * Parse the specified single XML file to register managed objects.
 	 */
-	public Factory parse(String xmlResource) {
+	@Override
+	public Loader parse(String xmlResource) {
 		if(this.launched) return this;
 		resolveXmlConfigBasedCrafts(xmlResource);
 		return this;
 	}
 	
 	/**
-	 * Append a managed bean instance into IOC container.
+	 * Append a managed bean instance into DI container.
 	 */
-	public Factory register(Object... beans) {
+	@Override
+	public Binder register(Object... beans) {
 		if(this.launched) return this;
 		if(Objects.isNull(beans)) return this;
 		if(beans.length == 0) return this;
@@ -160,7 +167,8 @@ public class Factory {
 		return this;
 	}
 	
-	public Factory register(List<String> classes) {
+	@Override
+	public Binder register(List<String> classes) {
 		if(this.launched) return this;
 		if(Objects.isNull(classes)) return this;
 		if(classes.isEmpty()) return this;
@@ -170,9 +178,10 @@ public class Factory {
 		return this;
 	}
 	/**
-	 * Append a managed bean into IOC container by class.
+	 * Append a managed bean into DI container by class.
 	 */
-	public Factory register(Class<?>... beans) {
+	@Override
+	public Binder register(Class<?>... beans) {
 		if(this.launched) return this;
 		if(Objects.isNull(beans)) return this;
 		if(beans.length == 0) return this;
@@ -182,7 +191,8 @@ public class Factory {
 	/**
 	 * Append a managed bean into IOC container by class name.
 	 */
-	public Factory register(String... classes) {
+	@Override
+	public Binder register(String... classes) {
 		if(this.launched) return this;
 		if(Objects.isNull(classes)) return this;
 		if(classes.length == 0) return this;
@@ -195,7 +205,8 @@ public class Factory {
 	/**
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(String abstraction, String implementation) {
+	@Override
+	public Binder bind(String abstraction, String implementation) {
 		if(this.launched) return this;
 		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation, abstraction);
@@ -206,7 +217,8 @@ public class Factory {
 	/**
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(String abstraction, Class<?> implementation) {
+	@Override
+	public Binder bind(String abstraction, Class<?> implementation) {
 		if(this.launched) return this;
 		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation.getName(), abstraction);
@@ -217,11 +229,26 @@ public class Factory {
 	/**
 	 * Bind an interface/abstract class to an implementation class and register it into the factory.
 	 */
-	public Factory bind(Class<?> abstraction, Class<?> implementation) {
+	@Override
+	public Binder bind(Class<?> abstraction, Class<?> implementation) {
 		if(this.launched) return this;
 		if(Hotpot.orNull(abstraction, implementation)) return this;
 		this.binders.put(implementation.getName(), abstraction.getName());
 		this.appendMaterial(this.toCraft(implementation));
+		return this;
+	}
+	
+	@Override
+	public Binder include(Object obj, String...name) {
+		if(this.launched) return this;
+		if(Objects.isNull(obj)) return this;
+		String key = null;
+		if(name != null && name.length == 1) {
+			key = name[0];
+		}else {
+			key = obj.getClass().getName();
+		}
+		appendMaterial(new Craft(key, obj));
 		return this;
 	}
 	
@@ -230,7 +257,9 @@ public class Factory {
 	 * The method equals the statement {@code register(classes).start();} <br>
 	 * Dont't call it directly on a factory instance, call the {@link Context.append()} instead. 
 	 */
+	@Override
 	public void append(Class<?>... classes) {
+		if(!this.launched) return;
 		if(!material.isEmpty()) return;
 		this.register0(classes);
 		this.assembleAndInstanceCrafts();
@@ -363,5 +392,14 @@ public class Factory {
 		var start = result.length() - 2;
 		result.delete(start, start + 2);
 		return result.toString();
-	}	
+	}
+	
+	public void reset() {
+		this.launched = false;
+		this.binders.clear();
+	}
+	
+	public boolean launched() {
+		return this.launched;
+	}
 }

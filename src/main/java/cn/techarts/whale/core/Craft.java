@@ -79,6 +79,14 @@ public class Craft {
 		this.resolveInjectedContructor(clazz);
 	}
 	
+	/**Include an external singleton object(NON-JSR330) into DI container*/
+	public Craft(String name, Object instance) {
+		this.name = name;
+		this.singleton = true;
+		this.assembled = true;
+		this.instance = instance;
+	}
+	
 	/**
 	 * Set dependent crafts (REF, KEY, VAL, PROVIDER) before assembling.
 	 */
