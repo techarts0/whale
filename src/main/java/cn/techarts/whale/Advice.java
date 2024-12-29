@@ -17,6 +17,9 @@
 package cn.techarts.whale;
 
 /**
+ * The implementation of interface Advice MUST have a default constructor.
+ * Namely, it MUST be instanced via the operator new without parameters.
+ * 
  * @author rocwon@gmail.com
  */
 public interface Advice {

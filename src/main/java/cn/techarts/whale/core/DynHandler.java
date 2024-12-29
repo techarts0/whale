@@ -68,7 +68,7 @@ public class DynHandler implements InvocationHandler {
 		try {
 			return arg.getDeclaredConstructor().newInstance();
 		}catch(Exception e) {
-			return null;
+			throw new RuntimeException("Failed to instance the advice.", e);
 		}
 	}
 	
