@@ -31,7 +31,7 @@ import cn.techarts.whale.util.Hotpot;
 import cn.techarts.whale.util.Scanner;
 
 /**
- * The core class of whale. It's responsible to<p>
+ * The core class of whale. It's responsible for<p>
  * 1. Load, scan and parse managed objects from JAR file, class-path and XML file.<br>  
  * 2. Resolve dependent relations and register them into container. <br>
  * 3. Assemble these managed objects and create instance.

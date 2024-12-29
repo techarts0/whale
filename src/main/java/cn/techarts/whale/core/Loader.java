@@ -16,6 +16,7 @@
 package cn.techarts.whale.core;
 
 /**
+ * Register managed objects from class-path, jar files or XML files automatically.
  * @author rocwon@gmail.com
  */
 public interface Loader {

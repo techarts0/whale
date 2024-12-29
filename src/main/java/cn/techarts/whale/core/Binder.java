@@ -19,6 +19,7 @@ package cn.techarts.whale.core;
 import java.util.List;
 
 /**
+ * Register managed object one by one manually.
  * @author rocwon@gmail.com
  */
 public interface Binder {
