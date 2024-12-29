@@ -1,8 +1,8 @@
 package cn.techarts.whale.test;
 
-import cn.techarts.whale.Advice;
+import cn.techarts.whale.aop.Advisor;
 
-public class ResultAdvice implements Advice{
+public class ResultAdvice implements Advisor{
 
 	@Override
 	public Object execute(Object[] args, Object result, Throwable threw) {

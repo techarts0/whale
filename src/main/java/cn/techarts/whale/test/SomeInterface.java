@@ -1,7 +1,7 @@
 package cn.techarts.whale.test;
 
-import cn.techarts.whale.Advise;
 import cn.techarts.whale.Bind;
+import cn.techarts.whale.aop.Advise;
 
 @Bind(target=SomeInterfaceImpl.class)
 public interface SomeInterface {

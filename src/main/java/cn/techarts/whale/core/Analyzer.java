@@ -30,7 +30,6 @@ import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
 import cn.techarts.whale.Panic;
-import cn.techarts.whale.Proxy;
 import cn.techarts.whale.Ready;
 
 //import jakarta.inject.Named;
@@ -40,6 +39,7 @@ import cn.techarts.whale.Ready;
 //import jakarta.inject.Singleton;
 
 import cn.techarts.whale.Valued;
+import cn.techarts.whale.aop.Advice;
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -78,8 +78,8 @@ public class Analyzer {
 					this.v = (Valued)anno; return;
 				}
 			}
-			if(anno instanceof Proxy) { //Interceptor
-				var p = ((Proxy)anno).value();
+			if(anno instanceof Advice) { //Interceptor
+				var p = ((Advice)anno).value();
 				if(p.isInterface()) {
 					this.proxy = p;
 				}else {

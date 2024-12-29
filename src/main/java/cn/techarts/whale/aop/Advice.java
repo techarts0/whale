@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package cn.techarts.whale;
+package cn.techarts.whale.aop;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * The implementation of interface Advice MUST have a default constructor.
- * Namely, it MUST be instanced via the operator new without parameters.
- * 
+ * Some aspects will be weaved into the specified class.
  * @author rocwon@gmail.com
  */
-public interface Advice {
-	public Object execute(Object[] args, Object result, Throwable threw);
-}
-
-class IgnoredAdvice implements Advice{
-	@Override
-	public Object execute(Object[] args, Object result, Throwable threw) {
-		return null;
-	}
-	
+@Documented
+@Retention(RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Advice {
+	/**
+	 * An interface.
+	 */
+	public Class<?> value();
 }

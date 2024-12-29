@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package cn.techarts.whale.core;
+package cn.techarts.whale.aop;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import cn.techarts.whale.Advice;
-import cn.techarts.whale.Advise;
 import cn.techarts.whale.Panic;
 
 /**
  * @author rocwon@gmail.com
  */
-public class DynHandler implements InvocationHandler {
+public class DefaultHandler implements InvocationHandler {
 	private Object target;
 	
-	public DynHandler(Object target) {
+	public DefaultHandler(Object target) {
 		this.target = target;
 	}
 	
@@ -61,7 +59,7 @@ public class DynHandler implements InvocationHandler {
 		}
 	}
 	
-	private Advice newAdvice(Class<? extends Advice> arg) {
+	private Advisor newAdvice(Class<? extends Advisor> arg) {
 		if("IgnoredAdvice".equals(arg.getSimpleName())) {
 			return null;
 		}
@@ -92,6 +90,7 @@ public class DynHandler implements InvocationHandler {
 		var cl = target.getClass().getClassLoader();
 		var ifs = target.getClass().getInterfaces();
 		if(ifs == null || ifs.length == 0)return target;
-		return t.cast(Proxy.newProxyInstance(cl, ifs, new DynHandler(target)));
+		var handler = new DefaultHandler(target);
+		return t.cast(Proxy.newProxyInstance(cl, ifs, handler));
 	}
 }

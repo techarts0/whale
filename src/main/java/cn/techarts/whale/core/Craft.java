@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import cn.techarts.whale.Panic;
+import cn.techarts.whale.aop.DefaultHandler;
 import cn.techarts.whale.util.Hotpot;
 
 /**
@@ -228,12 +229,12 @@ public class Craft {
 		try {
 			if(isDefaultConstructor()) {
 				instance = constructor.newInstance();
-				instance = DynHandler.create(instance, proxy);
+				instance = DefaultHandler.create(instance, proxy);
 			}else {
 				var params = toParameters();
 				if(Objects.isNull(params)) return this; //Waiting...
 				instance = constructor.newInstance(params);
-				instance = DynHandler.create(instance, proxy);
+				instance = DefaultHandler.create(instance, proxy);
 			}
 			//Support constructor and field injection mean time.
 			this.assembled = this.properties.isEmpty();

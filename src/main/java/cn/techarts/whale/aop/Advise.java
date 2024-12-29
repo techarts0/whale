@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.techarts.whale;
+package cn.techarts.whale.aop;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -28,7 +28,20 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Proxy {
-	public Class<?> value();
+@Target(ElementType.METHOD)
+public @interface Advise {
+	/**
+	 * The first statement in the method.
+	 */
+	public Class<? extends Advisor> before() default IgnoredAdvice.class;
+	
+	/**
+	 * The last statement after return statement.
+	 */
+	public Class<? extends Advisor> after() default IgnoredAdvice.class;
+	
+	/**
+	 * Invoke the method when an exception is threw.
+	 */
+	public Class<? extends Advisor> threw() default IgnoredAdvice.class;
 }
