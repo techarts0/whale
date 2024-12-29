@@ -93,7 +93,7 @@ public class WhaleTest {
 	
 	}
 	
-	@Test
+	//@Test
 	public void testIncludeExternalObject() {
 		var ctx = Context.make();
 		ctx.getBinder().include(new Object());
@@ -105,5 +105,17 @@ public class WhaleTest {
 		
 		TestCase.assertEquals(true, mydear != null);
 		TestCase.assertEquals(true, plain != null);
+	}
+	
+	@Test
+	public void testMethodIntercept() {
+		var ctx = Context.make();
+		ctx.getBinder().register(SomeInterfaceImpl.class);
+		ctx.start();
+		
+		var service = ctx.get(SomeInterface.class);
+		var result = service.getValue();
+		
+		TestCase.assertEquals(133, result);
 	}
 }

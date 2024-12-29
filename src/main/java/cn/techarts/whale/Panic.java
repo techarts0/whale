@@ -17,7 +17,7 @@
 package cn.techarts.whale;
 
 /**
- * Exception of IoC
+ * Exception of DI
  * 
  * @author rocwon@gmail.com
  */
@@ -119,5 +119,9 @@ public class Panic extends RuntimeException {
 	
 	public static Panic invalidBind(String from, String to) {
 		return new Panic("Failed to bind [" + from + "], because [" + to + "] does not exist.");
+	}
+	
+	public static Panic notAnInterface(Class<?> t) {
+		return new Panic("The class is not an interface: " + t.getName());
 	}
 }

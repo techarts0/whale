@@ -312,5 +312,5 @@ public final class Hotpot {
 	
 	public static boolean isNull(Map<?, ?> arg) {
 		return arg == null || arg.isEmpty();
-	}
+	}	
 }

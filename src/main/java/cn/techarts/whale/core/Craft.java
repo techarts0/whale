@@ -38,6 +38,7 @@ import cn.techarts.whale.util.Hotpot;
 public class Craft {
 	private String name;
 	private String type;
+	private Class<?> proxy;
 	private Method onReady;
 	private Object instance;
 	private boolean singleton;
@@ -68,9 +69,10 @@ public class Craft {
 	}
 	
 	/**From Annotation*/
-	public Craft(String name, Class<?> clazz, boolean singleton) {
-		this.name = name;
-		this.singleton = singleton;
+	public Craft(Class<?> clazz, Analyzer analyzer) {
+		this.proxy = analyzer.getProxy();
+		this.name = analyzer.getQualifierName();
+		this.singleton = analyzer.isSingleton();
 		this.methods = new HashMap<>();
 		this.arguments = new HashMap<>();
 		this.properties = new HashMap<>();
@@ -226,10 +228,12 @@ public class Craft {
 		try {
 			if(isDefaultConstructor()) {
 				instance = constructor.newInstance();
+				instance = DynHandler.create(instance, proxy);
 			}else {
 				var params = toParameters();
 				if(Objects.isNull(params)) return this; //Waiting...
 				instance = constructor.newInstance(params);
+				instance = DynHandler.create(instance, proxy);
 			}
 			//Support constructor and field injection mean time.
 			this.assembled = this.properties.isEmpty();
@@ -455,6 +459,13 @@ public class Craft {
 	
 	public void setInstance(Object instance) {
 		this.instance = instance;
+	}
+	
+	/**
+	 * An interface
+	 */
+	public Class<?> getProxy() {
+		return this.proxy;
 	}
 	
 	public void addProperty(Field field, Injectee arg) {

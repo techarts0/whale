@@ -1,9 +1,9 @@
 package cn.techarts.whale.test;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-
+import javax.inject.Singleton;
 import cn.techarts.whale.Bind;
+import cn.techarts.whale.Proxy;
 
 //import jakarta.inject.Inject;
 //import jakarta.inject.Named;
@@ -11,7 +11,8 @@ import cn.techarts.whale.Bind;
 import cn.techarts.whale.Valued;
 
 @Bind(value=SomeInterface.class, target=SomeInterfaceImpl.class)
-@Named
+@Singleton
+@Proxy(SomeInterface.class)
 public class SomeInterfaceImpl implements SomeInterface {
 	
 	private int val;

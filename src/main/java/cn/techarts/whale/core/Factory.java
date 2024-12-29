@@ -324,8 +324,7 @@ public class Factory implements Binder, Loader{
 		ifBindAnnotaionPresents(clazz);
 		if(!Hotpot.newable(clazz)) return null;
 		var analyzer = new Analyzer(clazz.getDeclaredAnnotations(), 2, clazz.getName());
-		if(!analyzer.isManagedObject()) return null; //Must declare Explicitly
-		return new Craft(analyzer.getQualifierName(), clazz, analyzer.isSingleton());			
+		return analyzer.isManagedObject() ? new Craft(clazz, analyzer) : null;
 	}
 	
 	private Craft toCraft(String className) {

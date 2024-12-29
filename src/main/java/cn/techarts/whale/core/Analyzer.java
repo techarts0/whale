@@ -29,6 +29,8 @@ import javax.inject.Provider;
 import javax.inject.Qualifier;
 import javax.inject.Singleton;
 
+import cn.techarts.whale.Panic;
+import cn.techarts.whale.Proxy;
 import cn.techarts.whale.Ready;
 
 //import jakarta.inject.Named;
@@ -52,6 +54,7 @@ public class Analyzer {
 	private Named n = null;
 	private Valued v = null;
 	private Annotation q = null;
+	private Class<?> proxy = null;
 	private String defaultName = null;
 	private boolean singleton = false;
 	
@@ -75,6 +78,14 @@ public class Analyzer {
 					this.v = (Valued)anno; return;
 				}
 			}
+			if(anno instanceof Proxy) { //Interceptor
+				var p = ((Proxy)anno).value();
+				if(p.isInterface()) {
+					this.proxy = p;
+				}else {
+					throw Panic.notAnInterface(p);
+				}
+			}
 			var type = anno.annotationType();
 			if(type.isAnnotationPresent(Qualifier.class)) {
 				this.q = anno;
@@ -93,6 +104,10 @@ public class Analyzer {
 	
 	private void setSingleton(boolean singleton) {
 		this.singleton = singleton;
+	}
+	
+	public Class<?> getProxy(){
+		return this.proxy;
 	}
 	
 	public void set(Injectee arg, Class<?> clazz) {
