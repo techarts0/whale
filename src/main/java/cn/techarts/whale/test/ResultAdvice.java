@@ -5,7 +5,7 @@ import cn.techarts.whale.aop.Advisor;
 public class ResultAdvice implements Advisor{
 
 	@Override
-	public Object execute(Object[] args, Object result, Throwable threw) {
+	public Object advise(Object[] args, Object result, Throwable threw) {
 		var tmp = (Integer)result;
 		return tmp + 100;
 	}

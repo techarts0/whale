@@ -40,21 +40,27 @@ public class DefaultHandler implements InvocationHandler {
 		if(advise == null) {
 			return method.invoke(target, args);
 		}
-		var after = newAdvice(advise.after());
+		var last = newAdvice(advise.last());
 		var threw = newAdvice(advise.threw());
+		var after = newAdvice(advise.after());
 		var before = newAdvice(advise.before());
+		
 		try{
 			if(before != null) {
-				before.execute(args, null, null);
+				before.advise(args, null, null);
 			}
 			result = method.invoke(this.target, args);
 			if(after == null) return result;
-			return after.execute(args, result, null);
+			return after.advise(args, result, null);
 		}catch(Throwable e) {
 			if(threw != null) {
-				return threw.execute(args, null, getEx(e));
+				return threw.advise(args, null, getEx(e));
 			}else {
 				throw new Panic("Failed to intercept the method.", e);
+			}
+		}finally {
+			if(last != null) {
+				return last.advise(args, result, null);
 			}
 		}
 	}

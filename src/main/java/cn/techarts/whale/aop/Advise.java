@@ -36,7 +36,7 @@ public @interface Advise {
 	public Class<? extends Advisor> before() default IgnoredAdvice.class;
 	
 	/**
-	 * The last statement after return statement.
+	 * The statement after return statement.
 	 */
 	public Class<? extends Advisor> after() default IgnoredAdvice.class;
 	
@@ -44,4 +44,9 @@ public @interface Advise {
 	 * Invoke the method when an exception is threw.
 	 */
 	public Class<? extends Advisor> threw() default IgnoredAdvice.class;
+	
+	/**
+	 * Invoke the method in the finally block to cleanup.
+	 */
+	public Class<? extends Advisor> last() default IgnoredAdvice.class;
 }

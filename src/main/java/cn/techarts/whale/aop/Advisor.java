@@ -23,12 +23,17 @@ package cn.techarts.whale.aop;
  * @author rocwon@gmail.com
  */
 public interface Advisor {
-	public Object execute(Object[] args, Object result, Throwable threw);
+	/**
+	 * @param args The parameters of the original method.
+	 * @param result The return value of the original method.
+	 * @param threw The exception that the original method threw.
+	 */
+	public Object advise(Object[] args, Object result, Throwable threw);
 }
 
 class IgnoredAdvice implements Advisor{
 	@Override
-	public Object execute(Object[] args, Object result, Throwable threw) {
+	public Object advise(Object[] args, Object result, Throwable threw) {
 		return null;
 	}
 	
