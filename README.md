@@ -518,10 +518,11 @@ public DemoServlet extends HttpServlet{
 	}
 }
 ```
+## 7. Interceptor
+Writing...
 
-## 7. Todo List
+## 8. Todo List
 We plan to add the following features:
-- Interceptor and Enhancer annotations.
 - Support namespace or module
 - Refactor code to improve performance.
 - Fix bugs as soon as they are found.
