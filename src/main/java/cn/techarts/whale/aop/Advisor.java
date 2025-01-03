@@ -31,7 +31,10 @@ public interface Advisor {
 	public Object advise(Object[] args, Object result, Throwable threw);
 }
 
-class IgnoredAdvice implements Advisor{
+/**
+ * Ignored the advisor, it is nothing to do.
+ */
+class ZeroAdvisor implements Advisor{
 	@Override
 	public Object advise(Object[] args, Object result, Throwable threw) {
 		return null;

@@ -35,21 +35,20 @@ public class DefaultHandler implements InvocationHandler {
 	
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		Object result = null;
 		var advise = method.getAnnotation(Advise.class);
 		if(advise == null) {
 			return method.invoke(target, args);
 		}
-		var last = newAdvice(advise.last());
-		var threw = newAdvice(advise.threw());
-		var after = newAdvice(advise.after());
-		var before = newAdvice(advise.before());
+		var last = getAdvisor(advise.last());
+		var threw = getAdvisor(advise.threw());
+		var after = getAdvisor(advise.after());
+		var before = getAdvisor(advise.before());
 		
 		try{
 			if(before != null) {
 				before.advise(args, null, null);
 			}
-			result = method.invoke(this.target, args);
+			var result = method.invoke(this.target, args);
 			if(after == null) return result;
 			return after.advise(args, result, null);
 		}catch(Throwable e) {
@@ -60,13 +59,13 @@ public class DefaultHandler implements InvocationHandler {
 			}
 		}finally {
 			if(last != null) {
-				return last.advise(args, result, null);
+				return last.advise(args, null, null);
 			}
 		}
 	}
 	
-	private Advisor newAdvice(Class<? extends Advisor> arg) {
-		if("IgnoredAdvice".equals(arg.getSimpleName())) {
+	private Advisor getAdvisor(Class<? extends Advisor> arg) {
+		if("ZeroAdvisor".equals(arg.getSimpleName())) {
 			return null;
 		}
 		try {
