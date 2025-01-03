@@ -26,10 +26,10 @@ import cn.techarts.whale.Panic;
 /**
  * @author rocwon@gmail.com
  */
-public class DefaultHandler implements InvocationHandler {
+public class AopHandler implements InvocationHandler {
 	private Object target;
 	
-	public DefaultHandler(Object target) {
+	public AopHandler(Object target) {
 		this.target = target;
 	}
 	
@@ -48,7 +48,7 @@ public class DefaultHandler implements InvocationHandler {
 			if(before != null) {
 				before.advise(args, null, null);
 			}
-			var result = method.invoke(this.target, args);
+			var result = method.invoke(target, args);
 			if(after == null) return result;
 			return after.advise(args, result, null);
 		}catch(Throwable e) {
@@ -95,7 +95,7 @@ public class DefaultHandler implements InvocationHandler {
 		var cl = target.getClass().getClassLoader();
 		var ifs = target.getClass().getInterfaces();
 		if(ifs == null || ifs.length == 0)return target;
-		var handler = new DefaultHandler(target);
+		var handler = new AopHandler(target);
 		return t.cast(Proxy.newProxyInstance(cl, ifs, handler));
 	}
 }
