@@ -561,7 +561,7 @@ public class SomeInterfaceImpl implements SomeInterface {
     private int val;
     @Inject
     public SomeInterfaceImpl(@Valued(val="33")int value) {
-	this.val = value;
+        this.val = value;
     }
 	
     @Override
