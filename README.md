@@ -529,15 +529,15 @@ public class LogAdvice implements Advisor {
     // threw: The potential exception threw by the method
     public Object advise(Object[] args, Object result, Throwable threw) {
     	System.out.println("Intercepted.");
-	return null;
+        return null;
     }
 }
 
 public class ResultAdvice implements Advisor{
     @Override
     public Object advise(Object[] args, Object result, Throwable threw) {
-	var tmp = (Integer)result;
-	return tmp + 100;
+        var tmp = (Integer)result;
+        return tmp + 100;
     }	
 }
 ```
