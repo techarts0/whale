@@ -519,7 +519,39 @@ public DemoServlet extends HttpServlet{
 }
 ```
 ## 7. Interceptor
-Writing...
+The interceptor in whale is based on JDK dynamic proxy. There are 2 annotations and an interface, it's limited but very easy to use. The following example describes the usage.
+
+```java
+public class LogAdvice implements Advisor {
+    @Override
+    public Object advise(Object[] args, Object result, Throwable threw) {
+    	System.out.println("Before: Intercepted");
+	return null;
+    }
+}
+```
+```java
+@Bind(target=SomeInterfaceImpl.class)
+public interface SomeInterface {
+    @Advise(before=LogAdvice.class, after=ResultAdvice.class)
+    public int getValue();
+}
+
+@Singleton
+@Advice(SomeInterface.class)
+public class SomeInterfaceImpl implements SomeInterface {
+    private int val;
+    @Inject
+    public SomeInterfaceImpl(@Valued(val="33")int value) {
+	this.val = value;
+    }
+	
+    @Override
+    public int getValue() {
+    	return this.val;
+    }
+}
+```
 
 ## 8. Todo List
 We plan to add the following features:
