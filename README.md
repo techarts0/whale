@@ -519,20 +519,38 @@ public DemoServlet extends HttpServlet{
 }
 ```
 ## 7. Interceptor
-The interceptor in whale is based on JDK dynamic proxy. There are 2 annotations and an interface, it's limited but very easy to use. The following example describes the usage.
+The interceptor in whale is based on JDK dynamic proxy. There are 2 annotations(Advice, Advise) and an interface(Advisor), it's limited but very easy to use. The following example describes the usage.
 
 ```java
 public class LogAdvice implements Advisor {
     @Override
+    // args: The parameters of the intercepted method
+    // result: The return value of the intercepted method
+    // threw: The potential exception threw by the method
     public Object advise(Object[] args, Object result, Throwable threw) {
-    	System.out.println("Before: Intercepted");
+    	System.out.println("Intercepted.");
 	return null;
     }
+}
+
+public class ResultAdvice implements Advisor{
+    @Override
+    public Object advise(Object[] args, Object result, Throwable threw) {
+	var tmp = (Integer)result;
+	return tmp + 100;
+    }	
 }
 ```
 ```java
 @Bind(target=SomeInterfaceImpl.class)
 public interface SomeInterface {
+    
+    // You can intercept a method at 4 places: 
+    // 1. before the first statement(before: Initialize), 
+    // 2. after the return statement(after: Change the result), 
+    // 3. an exception threw(threw: Handle the exception) and
+    // 4. in the finally block(last: Cleanup the resources).
+    
     @Advise(before=LogAdvice.class, after=ResultAdvice.class)
     public int getValue();
 }
