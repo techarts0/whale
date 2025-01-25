@@ -33,20 +33,20 @@ public @interface Advise {
 	/**
 	 * The first statement in the method.
 	 */
-	public Class<? extends Advisor> before() default ZeroAdvisor.class;
+	public Class<? extends Advisor> before() default NullAdvisor.class;
 	
 	/**
 	 * The statement after return statement.
 	 */
-	public Class<? extends Advisor> after() default ZeroAdvisor.class;
+	public Class<? extends Advisor> after() default NullAdvisor.class;
 	
 	/**
 	 * Invoke the method when an exception is threw.
 	 */
-	public Class<? extends Advisor> threw() default ZeroAdvisor.class;
+	public Class<? extends Advisor> threw() default NullAdvisor.class;
 	
 	/**
 	 * Invoke the method in the finally block to cleanup.
 	 */
-	public Class<? extends Advisor> last() default ZeroAdvisor.class;
+	public Class<? extends Advisor> last() default NullAdvisor.class;
 }

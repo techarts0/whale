@@ -34,7 +34,7 @@ public interface Advisor {
 /**
  * Ignored the advisor, it is nothing to do.
  */
-class ZeroAdvisor implements Advisor{
+class NullAdvisor implements Advisor{
 	@Override
 	public Object advise(Object[] args, Object result, Throwable threw) {
 		return null;

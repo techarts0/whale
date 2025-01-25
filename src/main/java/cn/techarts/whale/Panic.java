@@ -34,11 +34,11 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic nullName() {
-		return new Panic("The object name is null");
+		return new Panic("The object name is null.");
 	}
 	
 	public static Panic nullContainer() {
-		return new Panic("The object container is null!");
+		return new Panic("The object container is null.");
 	}
 	
 	public static Panic cannotSetFieldValue(Exception e) {
@@ -46,27 +46,27 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic classNotFound(String name, Throwable e) {
-		return new Panic("Can't find the object with name [" + name + "]", e);
+		return new Panic("Can not find the class [" + name + "].", e);
 	}
 	
 	public static Panic classNotFound(String name) {
-		return new Panic("Can't find the managed object with name [" + name + "]");
+		return new Panic("Can not find the managed object with name [" + name + "].");
 	}
 	
 	public static Panic cannotInstance(String name, Throwable e) {
-		return new Panic("Failed to call the constructor of [" + name + "]", e);
+		return new Panic("Failed to call the constructor of [" + name + "].", e);
 	}
 	
 	public static Panic cannotInvoke(String name, Throwable e) {
-		return new Panic("Failed to invoke the method [" + name + "]", e);
+		return new Panic("Failed to invoke the method [" + name + "].", e);
 	}
 	
 	public static Panic noQualifier(String name) {
-		return new Panic("You must qualify the constructor parameter[" + name + "]");
+		return new Panic("Must qualify the constructor parameter[" + name + "].");
 	}
 	
 	public static Panic annotationMissing() {
-		return new Panic("At least one of Named or Valued annotation is required.");
+		return new Panic("At least one of @Named or @Valued annotation is required.");
 	}
 	
 	public static Panic noSingleton() {
@@ -78,7 +78,7 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic noDefaultConstructor(Class<?> arg) {
-		return new Panic("Need a default constructor of class [" + arg.getName() + "]");
+		return new Panic("Need a default constructor of class [" + arg.getName() + "].");
 	}
 	
 	public static Panic circularDependence(String name) {

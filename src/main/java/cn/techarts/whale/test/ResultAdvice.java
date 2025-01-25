@@ -8,6 +8,5 @@ public class ResultAdvice implements Advisor{
 	public Object advise(Object[] args, Object result, Throwable threw) {
 		var tmp = (Integer)result;
 		return tmp + 100;
-	}
-	
+	}	
 }
