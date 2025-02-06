@@ -31,7 +31,7 @@ import cn.techarts.whale.util.Hotpot;
 
 /**
  * the DI container. <p>
- *
+ * TODO Support jakarta servlet API
  * @author rocwon@gmail.com
  */
 public class Context implements AutoCloseable{
@@ -100,6 +100,17 @@ public class Context implements AutoCloseable{
 	 * Retrieve the context from SERVLET context.(Web Application)
 	 */
 	public static Context from(ServletContext context) {
+		if(Objects.isNull(context)) return null;
+		var obj = context.getAttribute(NAME);
+		if(Objects.isNull(obj)) return null;
+		if(!(obj instanceof Context)) return null;
+		return (Context)obj;
+	}
+	
+	/**
+	 * For jakarta servlet api.
+	 */
+	public static Context from(jakarta.servlet.ServletContext context) {
 		if(Objects.isNull(context)) return null;
 		var obj = context.getAttribute(NAME);
 		if(Objects.isNull(obj)) return null;
@@ -195,6 +206,15 @@ public class Context implements AutoCloseable{
 	 * Cache the IOC context into  SERVLET context.
 	 */
 	public Context cache(ServletContext context) {
+		if(Objects.isNull(context)) return this;
+		context.setAttribute(NAME, this);
+		return this;
+	}
+	
+	/**
+	 * For jakarta servlet api.
+	 */
+	public Context cache(jakarta.servlet.ServletContext context) {
 		if(Objects.isNull(context)) return this;
 		context.setAttribute(NAME, this);
 		return this;
