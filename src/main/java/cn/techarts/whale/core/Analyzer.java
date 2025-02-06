@@ -43,6 +43,7 @@ import cn.techarts.whale.aop.Advice;
 import cn.techarts.whale.util.Hotpot;
 
 /**
+ * <p>javax & jakarta</p>
  * Analyze the annotations of the given class. 
  * It iterates each annotation to find the required metadata.<p>
  * 

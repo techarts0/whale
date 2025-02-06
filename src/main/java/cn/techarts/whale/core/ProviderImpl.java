@@ -17,12 +17,12 @@
 package cn.techarts.whale.core;
 
 import java.util.Objects;
+import javax.inject.Provider;
 
 //import jakarta.inject.Provider;
 
-import javax.inject.Provider;
-
 /**
+ * <p>javax & jakarta</p>
  * A default implementation of the interface {@link javax.inject.Provider<T>}.
  * 
  * @author rocwon@gmail.com

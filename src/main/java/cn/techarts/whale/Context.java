@@ -30,8 +30,8 @@ import cn.techarts.whale.core.Loader;
 import cn.techarts.whale.util.Hotpot;
 
 /**
+ * <p>javax & jakarta</p>
  * the DI container. <p>
- * TODO Support jakarta servlet API
  * @author rocwon@gmail.com
  */
 public class Context implements AutoCloseable{

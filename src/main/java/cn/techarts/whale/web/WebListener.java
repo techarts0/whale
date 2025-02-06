@@ -31,6 +31,7 @@ import cn.techarts.whale.Panic;
 import cn.techarts.whale.util.Hotpot;
 
 /**
+ * <p>javax & jakarta</p>
  * The class allows developer to integrate the whale in a web project.
  * 
  * @author rocwon@gmail.com

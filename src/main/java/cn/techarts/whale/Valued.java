@@ -24,6 +24,7 @@ import javax.inject.Qualifier;
 //import jakarta.inject.Qualifier;
 
 /**
+ * <p>javax & jakarta</p>
  * The annotation allows developer to inject<br>
  * 1. an explicit value, or<br>
  * 2. a key of configuration in configs.properties. 
