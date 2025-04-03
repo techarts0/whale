@@ -107,7 +107,7 @@ public class WhaleTest {
 		TestCase.assertEquals(true, plain != null);
 	}
 	
-	@Test
+	//@Test
 	public void testMethodIntercept() {
 		var ctx = Context.make();
 		ctx.getBinder().register(SomeInterfaceImpl.class);

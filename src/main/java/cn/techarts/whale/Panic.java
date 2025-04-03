@@ -66,7 +66,7 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic annotationMissing() {
-		return new Panic("At least one of @Named or @Valued annotation is required.");
+		return new Panic("One of @Named or @Valued annotation is required.");
 	}
 	
 	public static Panic noSingleton() {
@@ -82,7 +82,7 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic circularDependence(String name) {
-		return new Panic("Failed to assemble these beans because of circular dependent or dependence missing:\n" + name);
+		return new Panic("Failed to assemble these objects because of circular dependent or dependence missing:\n" + name);
 	}
 	
 	public static Panic configKeyMissing(String key) {
@@ -118,7 +118,7 @@ public class Panic extends RuntimeException {
 	}
 	
 	public static Panic invalidBind(String from, String to) {
-		return new Panic("Failed to bind [" + from + "], because [" + to + "] does not exist.");
+		return new Panic("Failed to bind [" + from + "] because [" + to + "] does not exist.");
 	}
 	
 	public static Panic notAnInterface(Class<?> t) {

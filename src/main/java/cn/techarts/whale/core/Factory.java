@@ -68,7 +68,7 @@ public class Factory implements Binder, Loader{
 		if(this.launched) return;
 		this.assembleAndInstanceCrafts();
 		this.launched = true; //The method can only be called ONCE.
-		LOGGER.info("Whale is initialized successfully (" + crafts.size() + " beans).");
+		LOGGER.info("Whale is initialized successfully (" + crafts.size() + " managed objects).");
 	}
 	
 	private void resolveJSR330BasedCrafts(String... classpath) {
