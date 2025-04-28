@@ -10,6 +10,7 @@
 [![Generic badge](https://img.shields.io/badge/Lightweight-00008B.svg)](https://shields.io/)
 [![Generic badge](https://img.shields.io/badge/High_Performance-0000FF.svg)](https://shields.io/)
 
+## Please access [DeepWiki](https://deepwiki.com/techarts0/whale) to get more useful help.
 
 ## 1. Summary
 Whale is a lightweight dependence Injection(DI) container that fully implements JSR330, and supports  **javax.inject**  and  **jakarta.inject**  API both. If you are a Java developer and familiar with spring framework or google guice, we highly recommend you giving whale a try.
